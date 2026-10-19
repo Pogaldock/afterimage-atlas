@@ -1075,7 +1075,7 @@ async function manifest(force){
   MAN=out;MANT=Date.now();return MAN;
 }
 // Flag writes are batched: one POST per burst of decisions, flushed on idle, on leaving, or every 15 actions.
-const QKEYS=["ids","unkeep","kill","unkill","elok","unelok","eldead","uneldead","mok","unmok","mdead","unmdead"];const Q={move:{}};for(const k of QKEYS)Q[k]=[];let QT=0,QN=0;
+const QKEYS=["ids","unkeep","kill","unkill","elok","unelok","eldead","uneldead","mok","unmok","mdead","unmdead","mseen","mdl"];const Q={move:{}};for(const k of QKEYS)Q[k]=[];let QT=0,QN=0;
 function flag(ch){
   for(const id of ch.ids||[]){LOCAL.ok.add(id);LOCAL.dead.delete(id);}
   for(const id of ch.unkeep||[])LOCAL.ok.delete(id);
@@ -1281,7 +1281,7 @@ function editsHTML(){
 function playEdit(id){
   const x=MONT.find(y=>y.id===id);if(!x)return;const adm=!!ADM;let i=MONT.indexOf(x);
   const el=document.createElement("div");el.className="mplay";document.body.classList.add("noscroll");
-  function draw(){const x=MONT[i];const st=mState(x.id);
+  function draw(){const x=MONT[i];const st=mState(x.id);lastT=0;
     el.innerHTML='<div class="mh"><span>'+esc(byId[x.style]?byId[x.style].name:x.style)+' · '+esc(x.track&&x.track.title||"")+(x.line?' · “'+esc(x.line)+'”':'')+'</span><button type="button" class="x" data-prev>‹</button><button type="button" data-next>›</button><button type="button" data-x>✕</button></div>'
       +'<video src="'+esc(x.mp4)+'" poster="'+esc(x.poster)+'" playsinline controls autoplay loop></video>'
       +'<div class="mf">'+(adm?'<button type="button" class="keep'+(st==="ok"?" on":"")+'" data-keep>Keep</button><button type="button" class="kill'+(st==="dead"?" on":"")+'" data-kill>Kill</button>':'')+'<a class="tbt" href="'+esc(x.mp4)+'" download="afterimage-'+esc(x.style)+'-'+x.id.slice(0,6)+'.mp4">Download</a>'+(x.track&&x.track.url?'<a class="tbt" href="'+esc(x.track.url)+'" target="_blank" rel="noopener">Track ↗</a>':'')+'</div>';
@@ -1292,6 +1292,11 @@ function playEdit(id){
     if(e.target.closest("[data-kill]")){const on=mState(x.id)==="dead";flag(on?{unmdead:[x.id]}:{mdead:[x.id]});blip(on?300:160);draw();return;}
     if(e.target.closest("[data-prev]")){i=(i+MONT.length-1)%MONT.length;draw();return;}
     if(e.target.closest("[data-next]")){i=(i+1)%MONT.length;draw();return;}});
+  // watched through once (it loops, so a wrap from the end back to the start) → after 48 h it is cleared unless kept or downloaded
+  let lastT=0,sentFor="";
+  el.addEventListener("timeupdate",e=>{const v=e.target;if(!adm||!v.duration)return;const x=MONT[i];
+    if(sentFor!==x.id&&lastT>v.duration*.9&&v.currentTime<lastT-1){sentFor=x.id;flag({mseen:[x.id]});}lastT=v.currentTime;},true);
+  el.addEventListener("click",e=>{if(adm&&e.target.closest("a[download]"))flag({mdl:[MONT[i].id]});},true);
   function onkey(e){if(e.key==="Escape")close();else if(e.key==="ArrowRight"){i=(i+1)%MONT.length;draw();}else if(e.key==="ArrowLeft"){i=(i+MONT.length-1)%MONT.length;draw();}}
   function close(){flush();document.removeEventListener("keydown",onkey);const v=el.querySelector("video");if(v){v.pause();v.removeAttribute("src");v.load();}el.remove();document.body.classList.remove("noscroll");}
   document.addEventListener("keydown",onkey);draw();document.body.appendChild(el);

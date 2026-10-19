@@ -74,7 +74,7 @@ async function writeManifest(env, m) { m.v = 3; m.count = Object.values(m.styles
 // ---------- flags: the only thing a triage session writes ----------
 async function flagsGet(env) {
   const [f, els] = await Promise.all([readJson(env, FKEY, emptyFlags()), readJson(env, EKEY, { items: [] })]);
-  return json({ ok: f.ok || [], dead: f.dead || [], moves: f.moves || {}, elok: f.elok || [], eldead: f.eldead || [], mok: f.mok || [], mdead: f.mdead || [], els: els.items || [] }, 200, { "cache-control": "public, max-age=20" });
+  return json({ ok: f.ok || [], dead: f.dead || [], moves: f.moves || {}, elok: f.elok || [], eldead: f.eldead || [], mok: f.mok || [], mdead: f.mdead || [], mseen: f.mseen || {}, mdl: f.mdl || [], els: els.items || [] }, 200, { "cache-control": "public, max-age=20" });
 }
 async function flagsPost(env, req) {
   const b = await req.json().catch(() => null);
@@ -102,6 +102,12 @@ async function flagsPost(env, req) {
   for (const id of b.mdead || []) if (idok(id)) { mdead.add(String(id)); mok.delete(String(id)); }
   for (const id of b.unmdead || []) mdead.delete(String(id));
   f.mok = [...mok]; f.mdead = [...mdead];
+  // watched edits: mseen = when he last played one through, mdl = downloaded (never pruned)
+  const ms = (f.mseen && typeof f.mseen === "object") ? f.mseen : {}, mdl = new Set(f.mdl || []);
+  for (const id of b.mseen || []) if (idok(id)) ms[String(id)] = now();
+  for (const id of b.mdl || []) if (idok(id)) mdl.add(String(id));
+  const ids = Object.keys(ms); if (ids.length > 3000) for (const k of ids.sort((a, c) => ms[a] - ms[c]).slice(0, ids.length - 3000)) delete ms[k];
+  f.mseen = ms; f.mdl = [...mdl].slice(-3000);
   f.ok = [...ok]; f.dead = [...dead]; f.updated = now();
   await putJson(env, FKEY, f);
   return json({ ok: true, kept: f.ok.length, dead: f.dead.length, moves: Object.keys(f.moves).length, cand });
@@ -306,6 +312,10 @@ export async function handleAtlas(req, env) {
     const sub = p.slice("/api/atlas/cur/".length);
     if (sub === "obj" && req.method === "GET") return objGet(env, (url.searchParams.get("o") || url.searchParams.get("key") || ""));
     if (sub === "obj" && req.method === "PUT") return objPut(env, req, (url.searchParams.get("o") || url.searchParams.get("key") || ""));
+    if (sub === "obj" && req.method === "DELETE") {   // only pruned edits can be deleted, nothing else
+      const k = url.searchParams.get("o") || ""; if (!/^atlas\/mont\/[a-z0-9]+\.(mp4|jpg)$/.test(k)) return json({ error: "key not allowed" }, 400);
+      await env.STORE.delete(k); return json({ ok: true });
+    }
     if (sub === "put" && req.method === "POST") return putMany(env, req);
     if (sub === "verdicts" && req.method === "POST") return verdicts(env, req);
     if (sub === "cand" && req.method === "POST") return candPut(env, req);

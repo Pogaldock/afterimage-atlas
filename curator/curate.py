@@ -428,10 +428,11 @@ def bundle(st):
         if (f.endswith(".webp") and f[:-5] not in live_el) or f.endswith(".png"): os.remove(os.path.join(st.bundle, "el", f))
     # montages (nightly edits from montage.py): mp4 + poster into the bundle, killed ones dropped from the site
     try:
-        mont = json.loads(obj_get("atlas/mont.json") or '{"items":[]}').get("items", []); mdead = set(st.flags.get("mdead", [])); mok = set(st.flags.get("mok", []))
+        mont = json.loads(obj_get("atlas/mont.json") or '{"items":[]}').get("items", []); mdead = set(st.flags.get("mdead", [])); mok = set(st.flags.get("mok", [])); mdl = set(st.flags.get("mdl", [])); mseen = st.flags.get("mseen") or {}
         md = os.path.join(st.bundle, "mont"); os.makedirs(md, exist_ok=True); shown = []
         for m in mont:
             if m["id"] in mdead: continue
+            if m["id"] not in mok and m["id"] not in mdl and time.time() - mseen.get(m["id"], 1e12) > 48 * 3600: continue   # watched, left: gone
             for ext, key in (("mp4", f"atlas/mont/{m['id']}.mp4"), ("jpg", f"atlas/mont/{m['id']}.jpg")):
                 fp = os.path.join(md, f"{m['id']}.{ext}")
                 if not os.path.exists(fp):
