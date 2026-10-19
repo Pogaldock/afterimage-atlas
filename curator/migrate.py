@@ -23,6 +23,7 @@ def copy_public(path, key, kind):
         if g.status_code != 200: stats["failed"].append(f"{kind} {key} {g.status_code}"); return
         ct = g.headers.get("content-type", "image/jpeg").split(";")[0]
         raw(key, g.content, ct); stats[kind] += 1; stats["bytes"][kind] = stats["bytes"].get(kind, 0) + len(g.content)
+    except requests.HTTPError as e: stats["failed"].append(f"{kind} {key} {e.response.status_code} {e.response.text[:120]}")
     except Exception as e: stats["failed"].append(f"{kind} {key} {type(e).__name__}")
 import traceback
 items = []
