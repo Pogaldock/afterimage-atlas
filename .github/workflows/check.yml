@@ -1,0 +1,44 @@
+# Live check of the atlas from outside: pages, data, files. Writes curator/last-check.md.
+name: atlas check
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: probe
+        run: |
+          S=https://atlas.symbiozefpv.com; O=curator/last-check.md
+          echo "# live check $(date -u '+%Y-%m-%d %H:%M UTC')" > $O; echo >> $O
+          for u in / /atlas/ /atlas/manifest.json /atlas/elements.json /atlas/mont.json /api/atlas/stats /api/atlas/flags /admin /atlas/icon.png; do
+            echo "- \`$u\` → $(curl -s -o /tmp/b -w '%{http_code} %{content_type} %{size_download}B' "$S$u")" >> $O
+          done
+          python3 - >> $O <<'PY'
+          import json, urllib.request
+          S = "https://atlas.symbiozefpv.com"
+          def get(u): return urllib.request.urlopen(urllib.request.Request(S + u, headers={"user-agent": "atlas-check"}), timeout=30)
+          m = json.load(get("/atlas/manifest.json")); st = m.get("styles", m)
+          n = sum(len(v) for v in st.values()); print(f"\n- manifest: {n} images in {len(st)} styles")
+          first = next(iter(st.values()))[0]; th = first.get("th") or first.get("url")
+          print(f"- thumbnail `{th}` → {get(th).status}")
+          o = first.get("url"); print(f"- original `{o}` → {get(o).status}")
+          e = json.load(get("/atlas/elements.json")).get("items", []); print(f"- elements: {len(e)}")
+          if e: print(f"- element file → {get('/atlas/el/' + e[0]['id'] + '.webp').status}")
+          mt = json.load(get("/atlas/mont.json")).get("items", []); print(f"- edits: {len(mt)}")
+          if mt:
+              r = get(mt[0]["mp4"]); print(f"- edit video → {r.status} {r.headers.get('content-type')} {r.headers.get('content-length')}B")
+          PY
+      - name: commit report
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "atlas bot"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git add curator/last-check.md && git commit -q -m "check: report" && git pull -q --rebase origin main && git push -q origin HEAD:main
