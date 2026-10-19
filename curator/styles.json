@@ -1,0 +1,1084 @@
+{
+ "_": "Per style: CLIP text prompts (what a good reference looks like) and image-search queries. Edit freely; the nightly job reads this.",
+ "crt": {
+  "prompts": [
+   "a CRT television still with scanlines and RGB phosphor fringing",
+   "a glitched anime frame with chromatic aberration and blown highlights",
+   "an emotional instagram edit of a film still with scanlines and a caption",
+   "lo-fi phosphor glow screen capture of a sad scene"
+  ],
+  "queries": [
+   "crt scanline anime edit",
+   "phosphor crt effect aesthetic edit",
+   "noblethevision edit",
+   "sad anime edit crt glitch instagram",
+   "crt chromatic aberration film still",
+   "vhs crt aesthetic edit hope",
+   "crt tv still anime 90s",
+   "sad edit scanlines caption",
+   "phosphor glow anime screenshot",
+   "crt filter edit instagram 2023",
+   "anime film still rgb split",
+   "crt aesthetic edit lain"
+  ],
+  "commons": [
+   "CRT scanlines",
+   "phosphor screen close-up"
+  ]
+ },
+ "datamosh": {
+  "prompts": [
+   "datamoshing glitch art with smeared macroblocks",
+   "a corrupted video frame with pixel bleed and compression artefacts",
+   "glitch art from a damaged mp4 i-frame"
+  ],
+  "queries": [
+   "datamosh glitch art",
+   "datamoshing frame macroblocks",
+   "pixel sorting glitch art",
+   "corrupted video frame art",
+   "glitch art compression artifacts",
+   "datamosh music video still",
+   "datamosh still",
+   "pixel bleed glitch frame",
+   "glitch art corrupted jpeg",
+   "datamosh music video frame",
+   "compression artefact art",
+   "macroblock glitch still"
+  ],
+  "commons": [
+   "datamoshing",
+   "glitch art"
+  ]
+ },
+ "analog": {
+  "prompts": [
+   "analog horror VHS still with tracking noise and timestamp",
+   "a camcorder found-footage frame with static",
+   "degraded videotape still with distorted text overlay"
+  ],
+  "queries": [
+   "analog horror vhs still",
+   "vhs tracking noise found footage",
+   "analog horror timestamp screenshot",
+   "local 58 style vhs frame",
+   "camcorder static aesthetic",
+   "vhs rip aesthetic still",
+   "analog horror still",
+   "vhs timestamp still 1994",
+   "camcorder footage still night",
+   "vhs tracking error still",
+   "analog horror text overlay",
+   "found footage still grain"
+  ],
+  "commons": [
+   "VHS tape artifacts",
+   "analog television noise"
+  ]
+ },
+ "y2k": {
+  "prompts": [
+   "Y2K aesthetic chrome text and translucent plastic design circa 2000",
+   "cyber y2k futurism blob shapes metallic gradient",
+   "late 90s tech optimism graphic design with lens flares",
+   "y2k fashion photo silver reflective clothing"
+  ],
+  "queries": [
+   "y2k aesthetic graphic design 2000",
+   "cyber y2k chrome text",
+   "y2k futurism poster 1999",
+   "y2k translucent plastic design",
+   "y2k magazine spread 2001",
+   "y2k fashion editorial 2000 silver",
+   "y2k cyber fashion 2000 photo",
+   "y2k web design 2000 screenshot",
+   "y2k poster chrome blob",
+   "y2k car ad 2001",
+   "y2k tech product 2000 translucent",
+   "y2k rave flyer 2000"
+  ],
+  "caa": [
+   "tag:eurodance AND firstreleasedate:[1998 TO 2002]",
+   "tag:trance AND firstreleasedate:[1999 TO 2002]"
+  ],
+  "commons": [
+   "Y2K aesthetic",
+   "iMac G3",
+   "translucent plastic 1999"
+  ]
+ },
+ "aero": {
+  "prompts": [
+   "Frutiger Aero glossy aqua design with bubbles grass and glass",
+   "2007 skeuomorphic wallpaper with water droplets and lens flare",
+   "Windows Vista era glossy UI with nature imagery"
+  ],
+  "queries": [
+   "frutiger aero wallpaper",
+   "frutiger aero design 2008",
+   "windows vista aero aesthetic",
+   "glossy aqua bubbles grass design 2006",
+   "frutiger aero advertisement",
+   "skeuomorphic glossy nature tech design",
+   "frutiger aero poster",
+   "windows 7 aero wallpaper",
+   "frutiger aero product 2008",
+   "aero glass ui 2007",
+   "frutiger aero magazine ad 2009",
+   "bubbles grass sky design 2006"
+  ],
+  "commons": [
+   "Windows Vista Aero",
+   "Frutiger Aero"
+  ]
+ },
+ "vapor": {
+  "prompts": [
+   "vaporwave album art with a greek bust pastel pink and cyan grid",
+   "vaporwave collage windows 95 japanese text palm trees",
+   "a e s t h e t i c vaporwave image"
+  ],
+  "queries": [
+   "vaporwave album cover",
+   "vaporwave aesthetic art",
+   "vaporwave collage greek bust",
+   "vaporwave bandcamp art 2013",
+   "vaporwave windows 95 aesthetic",
+   "floral shoppe style art",
+   "vaporwave poster print",
+   "vaporwave 3d render statue",
+   "vaporwave vhs cover art",
+   "vaporwave mall photo 80s",
+   "vaporwave japanese text pink",
+   "vaporwave grid sunset art"
+  ],
+  "caa": [
+   "tag:vaporwave",
+   "artist:\"Macintosh Plus\" OR artist:\"Saint Pepsi\" OR artist:2814 OR artist:\"Blank Banshee\""
+  ],
+  "commons": [
+   "vaporwave art"
+  ]
+ },
+ "weird": {
+  "prompts": [
+   "weirdcore image low resolution uncanny with cryptic text",
+   "dreamcore liminal space photo with eyes",
+   "distorted early 2000s photo with surreal captions"
+  ],
+  "queries": [
+   "weirdcore aesthetic",
+   "dreamcore image",
+   "weirdcore edit eyes text",
+   "liminal space weirdcore",
+   "dreamcore surreal edit 2000s photo",
+   "weirdcore wallpaper",
+   "weirdcore liminal hallway",
+   "weirdcore eyes text edit",
+   "dreamcore playground night",
+   "weirdcore low res photo 2001",
+   "dreamcore surreal room",
+   "weirdcore caption edit"
+  ]
+ },
+ "hyper": {
+  "prompts": [
+   "hyperpop album cover maximalist 3D render saturated plastic colours",
+   "PC Music style glossy digital art",
+   "hyperpop merch design chrome bubble letters"
+  ],
+  "queries": [
+   "hyperpop album cover",
+   "pc music artwork",
+   "100 gecs artwork",
+   "hyperpop aesthetic 3d render",
+   "sophie oil of every pearl cover",
+   "charli xcx pop 2 artwork",
+   "hyperpop single cover 2021",
+   "hyperpop merch design",
+   "pc music single art",
+   "hyperpop poster neon",
+   "sophie product artwork",
+   "hyperpop 3d chrome text"
+  ],
+  "caa": [
+   "tag:hyperpop",
+   "artist:\"100 gecs\" OR artist:SOPHIE OR artist:\"A. G. Cook\" OR artist:\"Dorian Electra\""
+  ]
+ },
+ "digi": {
+  "prompts": [
+   "digicore album cover lo-fi webcam anime glitchy phone edit",
+   "soundcloud emo rap cover art 2020",
+   "glaive ericdoa style cover art"
+  ],
+  "queries": [
+   "digicore album cover",
+   "digicore aesthetic edit",
+   "glaive cover art",
+   "ericdoa album art",
+   "soundcloud digicore artwork 2021",
+   "hyperpop digicore cover 2020",
+   "digicore single cover 2021",
+   "digicore artwork anime",
+   "soundcloud rap cover 2020 glitch",
+   "digicore merch",
+   "digicore edit webcam",
+   "ericdoa visual"
+  ],
+  "caa": [
+   "tag:digicore",
+   "artist:glaive OR artist:ericdoa OR artist:midwxst OR artist:brakence OR artist:aldn"
+  ]
+ },
+ "witch": {
+  "prompts": [
+   "witch house artwork with triangles crosses and unicode glyphs black and white",
+   "occult VHS-style witch house album cover",
+   "salem crystal castles era dark grainy art"
+  ],
+  "queries": [
+   "witch house album art",
+   "witch house aesthetic triangle cross",
+   "witch house artwork 2011",
+   "salem king night artwork",
+   "witch house visuals glyphs",
+   "white ring album art",
+   "witch house triangles cross art",
+   "witch house flyer 2011",
+   "witch house tumblr 2011 art",
+   "salem witch house visuals",
+   "witch house gif aesthetic",
+   "witch house font glyph art"
+  ],
+  "caa": [
+   "tag:\"witch house\"",
+   "artist:Salem OR artist:\"Crystal Castles\" OR artist:oOoOO OR artist:\"White Ring\""
+  ],
+  "no_ai": true
+ },
+ "drain": {
+  "prompts": [
+   "Drain Gang album art with angelic and medieval motifs chrome pale blue",
+   "Bladee Ecco2k cover art melancholic Y2K",
+   "Sad Boys Yung Lean visual world"
+  ],
+  "queries": [
+   "drain gang album art",
+   "bladee album cover",
+   "ecco2k e cover art",
+   "yung lean album artwork",
+   "drain gang aesthetic",
+   "thaiboy digital cover",
+   "drain gang merch",
+   "bladee merch design",
+   "sad boys 2013 artwork",
+   "drain gang poster",
+   "ecco2k visual",
+   "yung lean 2014 photo"
+  ],
+  "caa": [
+   "artist:Bladee OR artist:Ecco2k OR artist:\"Thaiboy Digital\" OR artist:\"Yung Lean\""
+  ]
+ },
+ "mound": {
+  "prompts": [
+   "Haunted Mound Sematary deep fried trailer park horror image",
+   "redneck gothic burned low-res photo",
+   "Ghost Mountain era witchcraft imagery"
+  ],
+  "queries": [
+   "sematary album cover",
+   "haunted mound aesthetic",
+   "sematary rainbow bridge art",
+   "ghost mountain sematary artwork",
+   "haunted mound visuals",
+   "sematary butcher house cover",
+   "haunted mound artwork",
+   "sematary live photo",
+   "haunted mound shirt",
+   "sematary visual deep fried",
+   "haunted mound flyer",
+   "grave man artwork"
+  ],
+  "caa": [
+   "artist:Sematary OR artist:\"Ghost Mountain\" OR artist:Hackle"
+  ],
+  "no_ai": true
+ },
+ "opium": {
+  "prompts": [
+   "Opium Playboi Carti era vampire goth rap visual red and black",
+   "blurred high contrast photo with inverted cross and leather fashion",
+   "Ken Carson Destroy Lonely cover art"
+  ],
+  "queries": [
+   "opium playboi carti aesthetic",
+   "playboi carti whole lotta red cover",
+   "ken carson album cover",
+   "destroy lonely album art",
+   "opium label aesthetic vampire",
+   "homixide gang artwork",
+   "opium aesthetic photo",
+   "playboi carti 2021 photo",
+   "ken carson visual",
+   "opium label merch",
+   "destroy lonely photo",
+   "opium goth rap fashion"
+  ],
+  "caa": [
+   "artist:\"Playboi Carti\" OR artist:\"Ken Carson\" OR artist:\"Destroy Lonely\" OR artist:\"Homixide Gang\""
+  ]
+ },
+ "goth": {
+  "prompts": [
+   "trad goth 1980s photo of a Batcave club goer with backcombed hair and white face",
+   "deathrock band photo 1983 black and white",
+   "goth gig flyer 1985",
+   "4AD style gothic rock record sleeve"
+  ],
+  "queries": [
+   "batcave club london 1983 photo",
+   "trad goth 1980s photo",
+   "siouxsie sioux 1981 photo",
+   "bauhaus band 1982 photo",
+   "deathrock 1983 los angeles photo",
+   "goth club flyer 1980s",
+   "sisters of mercy poster 1985",
+   "specimen band batcave",
+   "christian death only theatre of pain cover",
+   "alien sex fiend photo 1984",
+   "goth club photo 1986",
+   "goth fashion photo 1985 london",
+   "deathrock flyer 1983",
+   "goth fanzine page 1984",
+   "batcave crowd photo",
+   "post-punk gig poster 1981",
+   "goth hair backcombed photo 1984",
+   "4AD record sleeve Vaughan Oliver"
+  ],
+  "caa": [
+   "tag:\"gothic rock\" AND firstreleasedate:[1979 TO 1990]",
+   "tag:deathrock",
+   "artist:Bauhaus OR artist:\"Siouxsie and the Banshees\" OR artist:\"Christian Death\" OR artist:\"The Sisters of Mercy\"",
+   "artist:\"Fields of the Nephilim\" OR artist:\"Alien Sex Fiend\" OR artist:Specimen OR artist:\"45 Grave\""
+  ],
+  "commons": [
+   "goth subculture 1980s",
+   "Siouxsie and the Banshees 1980",
+   "Batcave"
+  ],
+  "no_ai": true
+ },
+ "scene": {
+  "prompts": [
+   "scene kid photo 2008 with neon raccoon tail hair and side fringe",
+   "MySpace profile layout 2007 scene",
+   "crunkcore band promo photo 2009",
+   "kandi bracelets and Hello Kitty scene aesthetic"
+  ],
+  "queries": [
+   "scene kid 2008 myspace photo",
+   "scene queen 2007 hair",
+   "myspace profile layout 2007 scene",
+   "scene hair raccoon tail neon",
+   "scene kids group photo 2009",
+   "kandi bracelets scene rave",
+   "brokencyde promo photo",
+   "scene aesthetic 2008",
+   "scene kid photo 2007 flash",
+   "scene hair extensions 2008",
+   "emo scene myspace selfie 2007",
+   "scene fashion neon 2008",
+   "hot topic scene 2008 photo",
+   "scene kid concert crowd 2009"
+  ],
+  "caa": [
+   "tag:crunkcore",
+   "artist:Brokencyde OR artist:\"Blood on the Dance Floor\" OR artist:Millionaires"
+  ],
+  "commons": [
+   "scene hair",
+   "emo fashion 2008"
+  ],
+  "no_ai": true
+ },
+ "black": {
+  "prompts": [
+   "Norwegian black metal band photo in corpse paint black and white grainy",
+   "illegible spiky black metal logo",
+   "black metal demo tape cover photocopied",
+   "Theodor Kittelsen style dark forest drawing"
+  ],
+  "queries": [
+   "darkthrone transilvanian hunger cover",
+   "black metal corpse paint photo 1993",
+   "mayhem euronymous photo",
+   "christophe szpajdel logo",
+   "black metal logo illegible",
+   "peter beste true norwegian black metal photo",
+   "burzum filosofem cover",
+   "immortal corpse paint forest photo",
+   "black metal demo tape photocopy cover",
+   "black metal xeroxed flyer 1992",
+   "satyricon dark medieval times cover",
+   "emperor in the nightside eclipse cover",
+   "black metal rehearsal photo 1992",
+   "black metal live photo candles",
+   "black metal fanzine page 1993",
+   "black metal logo sketch pen",
+   "black metal band spikes leather photo",
+   "Nordic forest black and white photo",
+   "medieval woodcut black metal",
+   "black metal demo cassette j-card",
+   "Peter Beste photo",
+   "black metal poster 1995"
+  ],
+  "caa": [
+   "tag:\"black metal\" AND firstreleasedate:[1991 TO 1996]",
+   "tag:\"black metal\" AND firstreleasedate:[1997 TO 2003]",
+   "artist:Darkthrone OR artist:Mayhem OR artist:Emperor OR artist:Burzum",
+   "artist:Immortal OR artist:Satyricon OR artist:Bathory OR artist:Gorgoroth OR artist:Marduk"
+  ],
+  "commons": [
+   "black metal band corpse paint",
+   "Theodor Kittelsen",
+   "Darkthrone"
+  ],
+  "no_ai": true
+ },
+ "death": {
+  "prompts": [
+   "old-school death metal album cover painted by Dan Seagrave",
+   "gore illustration death metal cover 1991",
+   "dripping death metal logo",
+   "Florida death metal band photo 1990"
+  ],
+  "queries": [
+   "dan seagrave album cover",
+   "ed repka death leprosy cover",
+   "vincent locke cannibal corpse cover",
+   "morbid angel altars of madness cover",
+   "entombed left hand path cover",
+   "death scream bloody gore cover",
+   "obituary cause of death cover",
+   "carcass symphonies of sickness cover",
+   "death metal logo 1991",
+   "deicide legion cover",
+   "autopsy mental funeral cover",
+   "bolt thrower realm of chaos cover",
+   "death metal demo tape 1989 cover",
+   "death metal fanzine 1990",
+   "death metal demo flyer 1989",
+   "death metal gig flyer tampa 1991",
+   "death metal logo sketch",
+   "death metal t-shirt 1992 photo",
+   "gore illustration ink 1991",
+   "death metal vinyl label",
+   "morrisound studio 1990 band photo"
+  ],
+  "caa": [
+   "tag:\"death metal\" AND firstreleasedate:[1987 TO 1994]",
+   "artist:\"Morbid Angel\" OR artist:Entombed OR artist:Obituary OR artist:\"Cannibal Corpse\" OR artist:Carcass",
+   "artist:Deicide OR artist:Suffocation OR artist:Autopsy OR artist:\"Bolt Thrower\" OR artist:Dismember"
+  ],
+  "commons": [
+   "death metal band 1990",
+   "Morbid Angel live"
+  ],
+  "no_ai": true
+ },
+ "sigil": {
+  "prompts": [
+   "cyber sigilism symmetrical spiky tattoo design",
+   "cyber tribal chrome blade shapes streetwear print",
+   "Y2K tribal 3D metal ornament graphic"
+  ],
+  "queries": [
+   "cyber sigilism tattoo",
+   "cyber sigilism design",
+   "cyber tribal shirt print",
+   "cybersigilism graphic",
+   "cyber sigil chrome 3d",
+   "tribal y2k spiky design streetwear",
+   "cyber sigilism tattoo flash sheet",
+   "cybersigilism sleeve tattoo",
+   "tribal cyber y2k vector",
+   "chrome sigil 3d render",
+   "cyber sigilism hoodie print",
+   "spiky tribal symmetric design"
+  ]
+ },
+ "punk": {
+  "prompts": [
+   "xeroxed punk flyer 1981 with ransom note lettering",
+   "Jamie Reid collage Sex Pistols artwork",
+   "Raymond Pettibon Black Flag flyer drawing",
+   "punk fanzine page 1977",
+   "Crass stencil artwork"
+  ],
+  "queries": [
+   "raymond pettibon black flag flyer",
+   "black flag flyer 1981 photocopy",
+   "crass record sleeve gee vaucher",
+   "crass stencil logo",
+   "punk fanzine 1977 sniffin glue",
+   "punk show flyer 1980s xerox",
+   "dead kennedys flyer winston smith collage",
+   "linder sterling collage buzzcocks",
+   "discharge record sleeve 1982",
+   "hardcore flyer 1983 xerox",
+   "jamie reid sex pistols collage",
+   "anarcho punk record sleeve collage",
+   "uk82 punk gig flyer",
+   "punk zine cut and paste layout 1979",
+   "punk patches and badges 1977",
+   "diy punk jacket back patch studs",
+   "hardcore matinee flyer 1984 photocopy",
+   "oi punk flyer 1981",
+   "punk poster screenprint 1978",
+   "crass style stencil poster",
+   "riot grrrl zine page",
+   "punk lettering hand drawn logo",
+   "Winston Smith collage"
+  ],
+  "caa": [
+   "tag:punk AND firstreleasedate:[1976 TO 1984]",
+   "tag:hardcore AND firstreleasedate:[1980 TO 1986]",
+   "artist:\"Sex Pistols\" OR artist:Crass OR artist:\"Black Flag\" OR artist:\"Dead Kennedys\" OR artist:Discharge",
+   "artist:Buzzcocks OR artist:\"The Exploited\" OR artist:\"Minor Threat\" OR artist:Conflict"
+  ],
+  "commons": [
+   "punk flyer 1980",
+   "Jamie Reid",
+   "punk concert 1977"
+  ],
+  "no_ai": true
+ },
+ "free": {
+  "prompts": [
+   "black and white photocopied free party flyer 1992 with an info line number",
+   "film photograph of a wall of DIY sound system speaker stacks in a field at a free party",
+   "photo of DJ turntables and vinyl records on a table in a squat or field rave",
+   "old army truck or ex-council bus converted into a home, traveller convoy, 1990s film photo",
+   "teknival crowd dancing in front of speaker stacks, dust and sunrise, documentary photo",
+   "acid techno vinyl record label or sleeve, 1990s, hand stamped white label",
+   "screen printed or photocopied rave poster, cut and paste collage",
+   "Spiral Tribe 23 artwork sound system"
+  ],
+  "queries": [
+   "spiral tribe flyer 1992",
+   "spiral tribe 23 logo",
+   "spiral tribe sound system rig",
+   "spiral tribe ufo teknival flyer",
+   "spiral tribe mark harrison artwork",
+   "network 23 record sleeve",
+   "castlemorton common 1992 rave photo",
+   "free party flyer photocopy 1992 info line",
+   "teknival 1994 sound system truck",
+   "mutoid waste company sculpture",
+   "bedlam sound system 1992 flyer",
+   "diy sound system flyer 1991",
+   "desert storm sound system sarajevo",
+   "free tekno 23 sticker",
+   "sp23 spiral tribe poster",
+   "acid techno squat party flyer 90s london",
+   "free party rig stack of speakers 1993 photo",
+   "traveller site trucks 1992 photo",
+   "teknival france 1995 photo",
+   "spiral tribe stage lights night rave",
+   "free party flyer scan 1994 black white",
+   "sound system logo 1990s tekno",
+   "DIY rave flyer photocopy cut and paste",
+   "acid teknival banner",
+   "Exodus collective sound system",
+   "UK free festival 1992 photo",
+   "23 symbol tekno sticker",
+   "tekno vinyl label art 1996",
+   "free party wall of speakers photo",
+   "teknival speaker stack photo",
+   "sound system rig field rave photo",
+   "rave speaker stack dust sunrise",
+   "diy sound system bass bins photo",
+   "free party rig night lights photo",
+   "speaker wall squat party photo",
+   "tekno rig speakers truck",
+   "dj decks vinyl free party photo",
+   "technics 1210 field rave photo",
+   "vinyl records crate rave 90s photo",
+   "acid techno white label vinyl",
+   "hand stamped white label techno",
+   "tekno vinyl record collection photo",
+   "acid techno record sleeve 1990s",
+   "new age travellers convoy 1980s photo",
+   "traveller buses 1990s photo",
+   "converted army truck traveller home",
+   "peace convoy stonehenge 1985 photo",
+   "old bedford truck traveller",
+   "teknival trucks camp photo",
+   "free party vans field morning",
+   "ex-army lorry sound system",
+   "road protest camp 1990s photo",
+   "living in a bus 90s travellers",
+   "teknival france photo documentary",
+   "czechtek photo crowd speakers",
+   "free party uk documentary photography",
+   "rave field morning after photo",
+   "acid house warehouse party 1989 photo",
+   "squat rave london 90s photo",
+   "free party flyer 1990s scan",
+   "teknival flyer scan",
+   "tekno flyer photocopy info line",
+   "acid techno party poster 90s",
+   "free festival poster 1980s",
+   "sound system logo sticker tekno",
+   "squat party flyer screen print"
+  ],
+  "caa": [
+   "artist:\"Spiral Tribe\"",
+   "tag:tekno AND firstreleasedate:[1992 TO 1999]",
+   "tag:\"acid techno\" AND firstreleasedate:[1993 TO 1999]"
+  ],
+  "commons": [
+   "Spiral Tribe",
+   "Castlemorton Common Festival",
+   "teknival sound system",
+   "free party sound system",
+   "New Age travellers",
+   "Stonehenge Free Festival",
+   "Battle of the Beanfield",
+   "Teknival",
+   "rave sound system speakers",
+   "Czechtek",
+   "free festival 1980s",
+   "technics SL-1200 turntable"
+  ],
+  "qpr": 12,
+  "no_ai": true,
+  "upload_min": 0.32,
+  "same": 0.94,
+  "per_query": 20
+ },
+ "_ai": "no_ai: true on a style = images that CLIP reads as AI-generated renders are pushed out of it; known AI-image hosts are blocked for every style. qpr = image-search queries per night for that style (default 4). upload_min / same / per_query override the global gates per style (lower upload_min = more permissive; higher same = allows closer variants). cpr = Commons categories searched per night for that style (default 1).",
+ "techno": {
+  "prompts": [
+   "dark warehouse techno party with strobes and smoke, documentary photo",
+   "Roland TR-909 or TB-303 drum machine on a table, photo",
+   "techno record label sleeve or white label vinyl",
+   "Detroit techno 1990s flyer or poster",
+   "Berlin techno club queue or bunker at night, film photo"
+  ],
+  "queries": [
+   "warehouse techno party photo strobe",
+   "techno rave smoke lasers photo",
+   "tr-909 drum machine photo",
+   "tb-303 bassline photo",
+   "techno dj booth vinyl photo",
+   "underground resistance logo",
+   "tresor berlin 1991 photo",
+   "detroit techno flyer 90s",
+   "techno white label vinyl",
+   "hard techno rave crowd photo",
+   "modular synth patch cables photo",
+   "techno festival lasers night",
+   "acid techno rave 1990s photo",
+   "berlin techno bunker photo",
+   "techno record sleeve design 90s",
+   "techno poster swiss style",
+   "rave laser tunnel photo",
+   "dj mixer knobs close up photo",
+   "warehouse party ibiza 1989 photo",
+   "techno club smoke machine photo"
+  ],
+  "commons": [
+   "Roland TR-909",
+   "Roland TB-303",
+   "techno music",
+   "rave party",
+   "laser show",
+   "DJ mixer",
+   "Tresor club"
+  ],
+  "caa": [
+   "tag:techno AND firstreleasedate:[1990 TO 1999]",
+   "tag:\"hard techno\""
+  ],
+  "no_ai": true,
+  "qpr": 6,
+  "cpr": 2,
+  "upload_min": 0.36
+ },
+ "digital": {
+  "prompts": [
+   "8-bit pixel art screenshot from an old computer game",
+   "ASCII art printed on a terminal",
+   "old computer boot screen or BIOS screen photo",
+   "bitmap dithered image from a 1980s computer",
+   "LCD screen pixels macro photo"
+  ],
+  "queries": [
+   "8-bit pixel art sprite sheet",
+   "old computer boot screen photo",
+   "bios screen photo",
+   "ascii art terminal screenshot",
+   "dithered bitmap 1bit art",
+   "lcd pixels macro photo",
+   "windows 95 error screen",
+   "dos prompt green screen photo",
+   "teletext page screenshot",
+   "old computer graphics 1985",
+   "pixel font sheet",
+   "crt monitor pixel close up",
+   "glitch screen photo broken lcd",
+   "demoscene amiga screenshot",
+   "vector graphics arcade screen photo",
+   "digital clock lcd segments",
+   "oscilloscope music vector display",
+   "computer punch card photo"
+  ],
+  "commons": [
+   "Pixel art",
+   "ASCII art",
+   "Teletext",
+   "Amiga",
+   "Liquid-crystal display",
+   "Demoscene"
+  ],
+  "caa": [],
+  "no_ai": true,
+  "qpr": 6,
+  "cpr": 2,
+  "upload_min": 0.36
+ },
+ "tech": {
+  "prompts": [
+   "macro photo of a green printed circuit board with components",
+   "oscilloscope screen showing a waveform",
+   "soldering iron and electronics workbench photo",
+   "vintage electronic test equipment with knobs and dials",
+   "breadboard with wires and LEDs"
+  ],
+  "queries": [
+   "circuit board macro photo",
+   "pcb close up components",
+   "oscilloscope waveform screen photo",
+   "electronics workbench soldering photo",
+   "vintage test equipment knobs dials",
+   "breadboard leds wires",
+   "vacuum tubes glowing photo",
+   "integrated circuit die photo",
+   "old radio chassis inside",
+   "transistor radio 1960s photo",
+   "cable spaghetti server room",
+   "synthesizer circuit board",
+   "nixie tubes photo",
+   "electronics schematic diagram vintage",
+   "resistors capacitors macro",
+   "old computer motherboard photo",
+   "telephone exchange switchboard photo",
+   "mainframe computer 1960s photo"
+  ],
+  "commons": [
+   "Printed circuit boards",
+   "Oscilloscopes",
+   "Vacuum tubes",
+   "Nixie tubes",
+   "Integrated circuits",
+   "Electronic test equipment",
+   "Mainframe computers"
+  ],
+  "caa": [],
+  "no_ai": true,
+  "qpr": 6,
+  "cpr": 2,
+  "upload_min": 0.36
+ },
+ "factory": {
+  "prompts": [
+   "black and white or colour documentary photo of a steelworks with sparks",
+   "assembly line workers in a factory, archive photo",
+   "industrial smokestacks against the sky",
+   "conveyor belts and machinery inside a factory",
+   "rusted industrial machinery close up"
+  ],
+  "queries": [
+   "steelworks sparks photo",
+   "factory assembly line 1950s photo",
+   "industrial smokestacks photo",
+   "factory interior machinery photo",
+   "foundry molten metal photo",
+   "car factory robots welding photo",
+   "abandoned factory interior",
+   "coal mine pithead photo",
+   "industrial pipes valves photo",
+   "shipyard cranes photo",
+   "factory workers shift archive photo",
+   "power station cooling towers",
+   "rusty machinery close up",
+   "industrial revolution factory engraving",
+   "chemical plant at night lights",
+   "blast furnace photo"
+  ],
+  "commons": [
+   "Steelworks",
+   "Assembly lines",
+   "Factories",
+   "Smokestacks",
+   "Foundries",
+   "Industrial archaeology",
+   "Blast furnaces"
+  ],
+  "caa": [],
+  "no_ai": true,
+  "qpr": 6,
+  "cpr": 2,
+  "upload_min": 0.36
+ },
+ "war": {
+  "prompts": [
+   "archive photograph of soldiers with helmets and radios",
+   "tank or armoured vehicle archive photo",
+   "searchlights over a city at night, war archive",
+   "military field radio equipment photo",
+   "night vision green photograph"
+  ],
+  "queries": [
+   "ww2 archive photo soldiers radio",
+   "tank archive photo",
+   "searchlights night sky 1940",
+   "military field radio photo",
+   "night vision photo green",
+   "gas mask archive photo",
+   "fighter planes formation archive",
+   "bunker concrete photo",
+   "camouflage pattern texture",
+   "military helicopter photo",
+   "trench ww1 archive photo",
+   "radar dish military photo",
+   "paratroopers archive photo",
+   "propaganda poster ww2",
+   "military map archive",
+   "anti aircraft guns night"
+  ],
+  "commons": [
+   "World War II photographs",
+   "World War I photographs",
+   "Searchlights",
+   "Military radios",
+   "Gas masks",
+   "Tanks",
+   "Propaganda posters"
+  ],
+  "caa": [],
+  "no_ai": true,
+  "qpr": 6,
+  "cpr": 2,
+  "upload_min": 0.36
+ },
+ "riot": {
+  "prompts": [
+   "documentary photo of riot police with shields facing protesters",
+   "tear gas cloud over a street protest",
+   "CRS French riot police line photo",
+   "burning barricade in a street at night",
+   "protest crowd with banners and smoke flares"
+  ],
+  "queries": [
+   "crs police line photo",
+   "riot police shields photo",
+   "tear gas protest photo",
+   "barricade fire street night photo",
+   "gilets jaunes paris photo",
+   "mai 68 paris photo barricade",
+   "protest smoke flares crowd",
+   "free party police teknival",
+   "rave police raid photo",
+   "riot shield wall photo",
+   "protest banners crowd photo",
+   "water cannon protest photo",
+   "police helmets visors close up",
+   "manifestation paris lacrymogene",
+   "poll tax riot 1990 photo",
+   "miners strike 1984 police photo"
+  ],
+  "commons": [
+   "Riot police",
+   "Tear gas",
+   "Compagnies républicaines de sécurité",
+   "Protests in Paris",
+   "May 1968 events in France",
+   "Yellow vests movement",
+   "Barricades"
+  ],
+  "caa": [],
+  "no_ai": true,
+  "qpr": 6,
+  "cpr": 2,
+  "upload_min": 0.36
+ },
+ "drone": {
+  "prompts": [
+   "FPV racing drone close up photo",
+   "drone pilot wearing FPV goggles",
+   "analog FPV video feed with static and OSD",
+   "quadcopter flying over a field photo",
+   "military drone archive photo"
+  ],
+  "queries": [
+   "fpv drone close up photo",
+   "fpv goggles pilot photo",
+   "fpv analog static feed",
+   "racing drone build photo",
+   "quadcopter propellers macro",
+   "drone swarm night lights",
+   "drone racing gates lights",
+   "military drone photo",
+   "drone shot over field",
+   "cinewhoop drone photo",
+   "drone motor macro photo",
+   "fpv freestyle drone bando",
+   "drone light show sky",
+   "dji drone flying photo"
+  ],
+  "commons": [
+   "Quadcopters",
+   "Unmanned aerial vehicles",
+   "First-person view",
+   "Drone racing"
+  ],
+  "caa": [],
+  "no_ai": true,
+  "qpr": 6,
+  "cpr": 2,
+  "upload_min": 0.36
+ },
+ "robot": {
+  "prompts": [
+   "vintage tin toy robot photo",
+   "industrial robot arm in a factory",
+   "humanoid android robot in a lab",
+   "1950s science fiction robot film still or poster",
+   "robot made of scrap metal sculpture"
+  ],
+  "queries": [
+   "vintage tin toy robot",
+   "industrial robot arm photo",
+   "robot arm welding sparks",
+   "humanoid robot lab photo",
+   "1950s robot movie poster",
+   "retro robot illustration",
+   "robot sculpture scrap metal",
+   "boston dynamics robot photo",
+   "unimate robot 1961",
+   "robot head close up",
+   "animatronic robot workshop",
+   "robot toy collection photo",
+   "robot exhibition museum",
+   "japanese robot toy 1960s"
+  ],
+  "commons": [
+   "Robots",
+   "Industrial robots",
+   "Toy robots",
+   "Humanoid robots",
+   "Robots in fiction"
+  ],
+  "caa": [],
+  "no_ai": true,
+  "qpr": 6,
+  "cpr": 2,
+  "upload_min": 0.36
+ },
+ "alien": {
+  "prompts": [
+   "blurry old photograph of a UFO in the sky",
+   "1950s flying saucer science fiction movie poster",
+   "grey alien illustration from a pulp magazine or tabloid",
+   "Roswell 1947 newspaper or archive photo",
+   "crop circle aerial photo"
+  ],
+  "queries": [
+   "ufo photo 1950s",
+   "flying saucer photo vintage",
+   "1950s sci fi movie poster aliens",
+   "pulp sci fi magazine cover alien",
+   "grey alien drawing 1990s",
+   "roswell 1947 newspaper",
+   "crop circle aerial photo",
+   "ufo sighting polaroid",
+   "alien abduction tabloid",
+   "area 51 sign photo",
+   "x-files ufo poster",
+   "alien mask rave",
+   "ufo museum roswell",
+   "vintage alien toy",
+   "flying saucer illustration retro",
+   "ufo lights night sky photo",
+   "alien comic book 1960s",
+   "close encounters poster",
+   "weekly world news alien",
+   "alien sticker 90s",
+   "ufo flyer rave",
+   "martian invasion poster",
+   "b movie alien still",
+   "alien plush toy rave"
+  ],
+  "commons": [
+   "Unidentified flying objects",
+   "Roswell incident",
+   "Crop circles",
+   "Flying saucers",
+   "Science fiction pulp magazines",
+   "Science fiction film posters",
+   "Extraterrestrial life in culture"
+  ],
+  "qpr": 10,
+  "caa": [],
+  "no_ai": true,
+  "cpr": 2,
+  "upload_min": 0.36
+ },
+ "psych": {
+  "prompts": [
+   "1960s psychedelic concert poster with melting lettering",
+   "op art black and white spiral or moire pattern",
+   "liquid light show projection photo",
+   "psychedelic blotter art print",
+   "kaleidoscopic mandala pattern print"
+  ],
+  "queries": [
+   "fillmore poster 1967",
+   "psychedelic concert poster 60s",
+   "op art bridget riley",
+   "liquid light show photo",
+   "blotter art print",
+   "psychedelic mandala print",
+   "1960s psychedelic lettering",
+   "psytrance flyer 90s",
+   "goa trance party photo uv",
+   "uv blacklight poster",
+   "kaleidoscope photo",
+   "acid house smiley flyer",
+   "psychedelic album cover 1968",
+   "fractal print 90s poster",
+   "oil wheel projection photo",
+   "tie dye pattern"
+  ],
+  "commons": [
+   "Psychedelic art",
+   "Op art",
+   "Liquid light shows",
+   "Psychedelic posters",
+   "Blacklight posters",
+   "Kaleidoscopes"
+  ],
+  "caa": [
+   "tag:\"psychedelic rock\" AND firstreleasedate:[1966 TO 1970]",
+   "tag:\"goa trance\""
+  ],
+  "no_ai": true,
+  "qpr": 6,
+  "cpr": 2,
+  "upload_min": 0.36
+ }
+}

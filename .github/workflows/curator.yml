@@ -1,0 +1,68 @@
+# Nightly atlas curator: CLIP scoring, dedupe, thumbnails, image search. Free GitHub Actions minutes; no Cloudflare compute.
+name: atlas curator
+on:   # nightly schedule switches on after the one-off migration
+  workflow_dispatch:
+    inputs:
+      skip:
+        description: "steps to skip, comma-separated (embed,score,dedupe,thumbs,search)"
+        default: ""
+      only:
+        description: "catch-up: image search only for these styles (e.g. free)"
+        default: ""
+      qpr:
+        description: "image-search queries per style this run (0 = config)"
+        default: "0"
+permissions:
+  contents: write
+concurrency: curator-2
+jobs:
+  curate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: curator/requirements.txt
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: openclip-vitb32-laion2b
+      - run: pip install -r curator/requirements.txt
+      - name: curate
+        env:
+          ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
+          IN_SKIP: ${{ github.event.inputs.skip }}
+          IN_ONLY: ${{ github.event.inputs.only }}
+          IN_QPR: ${{ github.event.inputs.qpr }}
+        run: |
+          args=()
+          for s in $(echo "$IN_SKIP" | tr ',' ' '); do [[ "$s" =~ ^[a-z]+$ ]] && args+=(--skip "$s"); done
+          [[ "$IN_ONLY" =~ ^[a-z,]+$ ]] && args+=(--only "$IN_ONLY")
+          [[ "$IN_QPR" =~ ^[1-9][0-9]?$ ]] && args+=(--qpr "$IN_QPR")
+          python curator/curate.py "${args[@]}"
+      - name: redeploy the site (Cloudflare deploy hook) so the new bundle goes live
+        env:
+          DEPLOY_HOOK: ${{ secrets.DEPLOY_HOOK }}
+        run: |
+          if [ -n "$DEPLOY_HOOK" ]; then curl -fsS -o /dev/null -X POST "$DEPLOY_HOOK" && echo "site build triggered"; else echo "no DEPLOY_HOOK secret"; fi
+      - name: commit run report
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "atlas bot"; git config user.email "curator@users.noreply.github.com"
+          git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          cp curator/last-run.md /tmp/report.md
+          for i in 1 2 3 4 5; do
+            git reset -q --hard && git fetch -q origin main && git checkout -q -B main origin/main
+            cp /tmp/report.md curator/last-run.md
+            git add curator/last-run.md
+            if git diff --cached --quiet; then echo "no report change"; break; fi
+            if git commit -q -m "curator: run report" && git push -q origin main; then echo "report pushed"; break; fi
+            echo "push rejected, retrying ($i)"; sleep $((i*15))
+          done

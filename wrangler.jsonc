@@ -1,0 +1,13 @@
+{
+  // Standalone Worker for the Afterimage Atlas. Isolated from the main site: own bucket, own secrets, no database.
+  // Secrets (set in the Cloudflare dashboard, never in this file): ATLAS_TOKEN (jobs), ATLAS_ADMIN_KEY (owner login).
+  // Build variable (dashboard → Settings → Build): ATLAS_TOKEN, so the build can fetch the nightly static bundle.
+  "name": "afterimage-atlas",
+  "main": "src/index.js",
+  "compatibility_date": "2025-03-07",
+  "assets": { "directory": "./public", "binding": "ASSETS" },
+  "r2_buckets": [{ "binding": "STORE", "bucket_name": "afterimage" }],
+  "routes": [{ "pattern": "atlas.symbiozefpv.com", "custom_domain": true }],
+  "build": { "command": "node scripts/atlas-assets.mjs" },
+  "observability": { "enabled": true }
+}

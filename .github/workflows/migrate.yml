@@ -1,0 +1,28 @@
+# One-off: copy the atlas from the main site's bucket into this Worker's bucket. Manual only. Delete after it has run.
+name: atlas migrate
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -q requests
+      - name: copy
+        env:
+          OLD_ATLAS_TOKEN: ${{ secrets.OLD_ATLAS_TOKEN }}
+          ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
+        run: python curator/migrate.py
+      - name: redeploy (Cloudflare deploy hook)
+        if: always()
+        env:
+          DEPLOY_HOOK: ${{ secrets.DEPLOY_HOOK }}
+        run: if [ -n "$DEPLOY_HOOK" ]; then curl -fsS -o /dev/null -X POST "$DEPLOY_HOOK" && echo "build triggered"; fi
