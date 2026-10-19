@@ -1,6 +1,8 @@
 # Nightly atlas curator: CLIP scoring, dedupe, thumbnails, image search. Free GitHub Actions minutes; no Cloudflare compute.
 name: atlas curator
-on:   # nightly schedule switches on after the one-off migration
+on:
+  schedule:
+    - cron: "10 */4 * * *"   # every 4 hours
   workflow_dispatch:
     inputs:
       skip:

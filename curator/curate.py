@@ -474,6 +474,21 @@ def bundle(st):
     report["bundle"] = {"images": sum(len(a) for a in styles.values()), "thumbs": len(os.listdir(os.path.join(st.bundle, "t"))), "elements": len(els), "parts": len(parts), "mb": round(sum(p["bytes"] for p in parts) / 1e6, 1)}
     log("bundle:", report["bundle"])
 
+LIB_MAX = int(os.environ.get("LIB_MAX", "9000"))   # images kept on the site: stays well under the free plan's 20,000 static files and 10 GB
+def budget(st, meta):
+    """before searching, make room: drop the lowest-scoring images you haven't kept, never below 60 per style"""
+    room = LIB_MAX - MAX_UPLOADS; ok = set(st.flags.get("ok", [])); dead = set(st.flags.get("dead", []))
+    live = [it for it in st.items if it["id"] not in dead]
+    if len(live) <= room: report["budget"] = f"{len(live)} images, limit {LIB_MAX}"; return []
+    per = {}
+    for it in live: per.setdefault(it["style"], []).append(it)
+    cands = []
+    for sty, arr in per.items():
+        arr = sorted([it for it in arr if it["id"] not in ok], key=lambda it: (meta.get(it["id"], {}).get("cs") or it.get("cs") or 0))
+        cands += arr[:max(0, len(per[sty]) - 60)]
+    cands.sort(key=lambda it: (meta.get(it["id"], {}).get("cs") or it.get("cs") or 0)); drop = [it["id"] for it in cands[:len(live) - room]]
+    report["budget"] = f"{len(live)} images, limit {LIB_MAX}: dropped {len(drop)} lowest-scoring unkept"; return drop
+
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--skip", action="append", default=[]); ap.add_argument("--run", type=int, default=int(time.time() // 86400)); ap.add_argument("--only", default=""); ap.add_argument("--qpr", type=int, default=0); a = ap.parse_args()
     if a.only:                                   # catch-up run: source only these styles (everything else still scored/bundled)
@@ -488,7 +503,7 @@ def main():
         meta, kill, move = ({}, [], {})
         if "score" not in a.skip: meta, kill, move = score_archive(st)
         dupes = [] if "dedupe" in a.skip else dedupe(st, set(kill) | set(st.flags.get("dead", [])))
-        apply(st, meta, kill + dupes, move)
+        apply(st, meta, kill + dupes + budget(st, meta), move)
         if "source" not in a.skip: source(st, a.run)
         promote(st)
         if "bundle" not in a.skip: bundle(st)

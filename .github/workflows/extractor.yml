@@ -1,6 +1,8 @@
 # Nightly auto cut-outs: FastSAM + ISNet + CLIP on free GitHub minutes. Candidates go to the Cuts review feed.
 name: atlas extractor
-on:   # nightly schedule switches on after the one-off migration
+on:
+  schedule:
+    - cron: "50 2-23/4 * * *"   # every 4 hours
   workflow_dispatch:
     inputs:
       cap:
