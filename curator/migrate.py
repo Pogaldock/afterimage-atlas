@@ -32,17 +32,18 @@ try:
             "extracted.json", "elhist.json", "curator.json", "extractor.json", "mont.json", "static.json"]
     static_idx = json.loads(oget("atlas/static.json") or b'{"parts":[]}')
     keys += [p["key"][len("atlas/"):] for p in static_idx.get("parts", [])]
-    for k in keys:
+    ONLY = set(filter(None, os.environ.get("ONLY", "").split(",")))   # re-run for just these styles' images
+    for k in ([] if ONLY else keys):
         data = oget("atlas/" + k)
         if data is None: print("missing", k); continue
         ct = "application/json" if k.endswith(".json") else ("application/x-tar" if k.endswith(".tar") else "application/octet-stream")
         nput("atlas/" + k, data, ct); stats["objects"] += 1; stats["bytes"]["objects"] = stats["bytes"].get("objects", 0) + len(data); print("obj", k, len(data))
     # 2. originals, elements, candidates, edits
     man = json.loads(oget("atlas/manifest.json") or b'{"styles":{}}')
-    items = [it for arr in man.get("styles", {}).values() for it in arr]
-    els = json.loads(oget("atlas/elements.json") or b'{"items":[]}').get("items", [])
-    cands = json.loads(oget("atlas/cands.json") or b'{"items":[]}').get("items", [])
-    mont = json.loads(oget("atlas/mont.json") or b'{"items":[]}').get("items", [])
+    items = [it for st_, arr in man.get("styles", {}).items() for it in arr if not ONLY or st_ in ONLY]
+    els = [] if ONLY else json.loads(oget("atlas/elements.json") or b'{"items":[]}').get("items", [])
+    cands = [] if ONLY else json.loads(oget("atlas/cands.json") or b'{"items":[]}').get("items", [])
+    mont = [] if ONLY else json.loads(oget("atlas/mont.json") or b'{"items":[]}').get("items", [])
     print(f"{len(items)} images, {len(els)} elements, {len(cands)} candidates, {len(mont)} edits")
     with ThreadPoolExecutor(12) as ex:
         for it in items:

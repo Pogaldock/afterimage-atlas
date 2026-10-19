@@ -2,6 +2,10 @@
 name: atlas migrate
 on:
   workflow_dispatch:
+    inputs:
+      only:
+        description: "only these styles' images (comma list), empty = everything"
+        default: ""
 permissions:
   contents: write
 jobs:
@@ -20,6 +24,7 @@ jobs:
         env:
           OLD_ATLAS_TOKEN: ${{ secrets.OLD_ATLAS_TOKEN }}
           ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
+          ONLY: ${{ github.event.inputs.only }}
         run: python curator/migrate.py
       - name: redeploy (Cloudflare deploy hook)
         if: always()

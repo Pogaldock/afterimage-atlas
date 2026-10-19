@@ -35,7 +35,7 @@ function safeEq(a, b) {
 }
 // served bytes are never interpreted as a document on this origin
 const SAFE = { "x-content-type-options": "nosniff", "content-security-policy": "default-src 'none'; sandbox" };
-const IMG_KEY = /^atlas\/[a-z]+\/[a-f0-9]{20}\.(jpg|png|webp|gif|avif)$/;
+const IMG_KEY = /^atlas\/[a-z0-9]+\/[a-f0-9]{20}\.(jpg|png|webp|gif|avif)$/;
 function okTok(env, req) {
   const h = req.headers.get("authorization") || "";
   const t = h.startsWith("Bearer ") ? h.slice(7).trim() : "";
