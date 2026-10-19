@@ -188,6 +188,11 @@ body.noscroll{overflow:hidden;touch-action:none}
 .mplay .mtoast.on{opacity:1}
 .mplay .mh button{min-width:44px;min-height:44px;font-size:16px}
 @media (hover:none){.mplay .mnav{display:none}}
+.mplay .mwhy{position:absolute;left:0;right:0;bottom:0;z-index:3;background:rgba(10,10,14,.97);border-top:1px solid rgba(255,255,255,.2);padding:16px 12px calc(16px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mplay .mwhy p{grid-column:1/-1;margin:0 0 4px;text-align:center;font-size:13px;letter-spacing:.12em}
+.mplay .mwhy button{min-height:72px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:#3a0b16;border-color:#ff3b6b;color:#ffd0db}
+.mplay .mwhy button b{font-size:24px}
+.mplay .mwhy .c{grid-column:1/-1;min-height:48px;background:#1b1b1b;border-color:rgba(255,255,255,.25);color:#fff}
 .egrid .el{margin:0;position:relative;border-radius:8px;overflow:hidden;background:conic-gradient(#2a2a2a 25%,#444 0 50%,#2a2a2a 0 75%,#444 0) 0 0/18px 18px;aspect-ratio:1;display:grid;place-items:center;cursor:zoom-in}
 .egrid .el img{max-width:92%;max-height:92%;object-fit:contain}
 .egrid .el figcaption{position:absolute;left:0;right:0;bottom:0;padding:4px 8px;font-family:var(--f-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;background:rgba(0,0,0,.6);color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -707,6 +712,11 @@ const STYLES=[
  obj:{g:"sphere",m:2,a:"#39ff14",b:"#b026ff",c:"#e0ffe0"},logo:"weird",glyph:"eye",pat:"stars",loop:"hue",flyer:"weird",
  snd:{bpm:96,drone:[55,55.6],wave:"sine",cut:2000,dist:0,noise:.05,arp:[440,554,659,880,659,554],arpRate:12,arpWave:"triangle",arpCut:3000,sweep:1},
  v:{ink:"#e0ffe0",mut:"#7fcf8a",line:"rgba(57,255,20,.3)",panel:"rgba(3,20,10,.85)",acc:"#b026ff",r:"20px",chipr:"20px",tfont:"'Major Mono Display',monospace"}},
+{id:"meme",mode:6,name:"Memes",era:"1996 →",pal:["#0b0b0b","#ffffff","#ffd400","#ff3b3b","#1e90ff"],tag:"Templates, reaction faces and the pictures everyone already knows.",
+ names:["image macro","reaction pic","template","shitpost","deep fried","copypasta"],rel:["hyper","weird","digi"],
+ obj:{g:"sphere",m:2,a:"#ffd400",b:"#ff3b3b",c:"#ffffff"},logo:"weird",glyph:"eye",pat:"stars",loop:"hue",flyer:"weird",
+ snd:{bpm:128,drone:[65,65.4],wave:"square",cut:2400,dist:.2,noise:.03,arp:[523,659,784,1047,784,659],arpRate:10,arpWave:"square",arpCut:3600,sweep:1},
+ v:{ink:"#ffffff",mut:"#c9c9c9",line:"rgba(255,212,0,.35)",panel:"rgba(11,11,11,.88)",acc:"#ffd400",r:"20px",chipr:"20px",tfont:"'Major Mono Display',monospace"}},
 {id:"psych",mode:8,name:"Psychedelic",era:"1965 →",pal:["#ff2e88","#ffe600","#00e0ff","#7a00ff","#ff7a00"],tag:"Melting letters, op-art spirals and liquid light.",
  names:["Fillmore poster","op art","liquid light show","blotter","mandala","kaleidoscope"],rel:["alien","free","vapor"],
  obj:{g:"torus",m:2,a:"#ff2e88",b:"#ffe600",c:"#00e0ff"},logo:"fried",glyph:"sun",pat:"spiral",loop:"hue",flyer:"bubble",
@@ -723,7 +733,8 @@ const FAM=[
 {name:"Extreme metal",ids:["black","death","sigil"]},
 {name:"Punk and free party",ids:["punk","free","riot"]},
 {name:"Techno and machines",ids:["techno","factory","robot","tech","digital"]},
-{name:"Signals from elsewhere",ids:["alien","psych","drone","war"]}
+{name:"Signals from elsewhere",ids:["alien","psych","drone","war"]},
+{name:"Internet folklore",ids:["meme"]}
 ];
 const byId={};STYLES.forEach((s,i)=>{s.i=i;byId[s.id]=s;});
 const N=STYLES.length;
@@ -1070,7 +1081,7 @@ function styleHTML(s){
 /* ---------------- real images (site store) ---------------- */
 /* ===================== real material: static manifest + live flags ===================== */
 let MAN=null,MANT=0,ADM=null,FLAGS={ok:[],dead:[],moves:{},els:[],elok:[],eldead:[],mok:[],mdead:[]},ELS=[],CANDS=[],PAL={},MONT=[];
-const LOCAL={ok:new Set(),dead:new Set(),moves:{},elok:new Set(),eldead:new Set(),mok:new Set(),mdead:new Set()};   // decisions made in this session, applied instantly
+const LOCAL={ok:new Set(),dead:new Set(),moves:{},elok:new Set(),eldead:new Set(),mok:new Set(),mdead:new Set(),mdl:new Set()};   // decisions made in this session, applied instantly
 const AKEY=()=>{try{return localStorage.getItem("atlas_key")||"";}catch(e){return "";}};
 async function isAdm(){if(ADM!==null)return ADM;try{localStorage.removeItem("atlas_key");}catch(e){}try{const r=await fetch("/api/atlas/me",{cache:"no-store"});ADM=!!(await r.json()).admin;}catch(e){ADM=false;}return ADM;}
 const hostOf=p=>{try{return new URL(p).host.replace(/^www\./,"");}catch(e){return "";}};
@@ -1089,7 +1100,7 @@ async function manifest(force){
   MAN=out;MANT=Date.now();return MAN;
 }
 // Flag writes are batched: one POST per burst of decisions, flushed on idle, on leaving, or every 15 actions.
-const QKEYS=["ids","unkeep","kill","unkill","elok","unelok","eldead","uneldead","mok","unmok","mdead","unmdead","mseen","mdl"];const Q={move:{}};for(const k of QKEYS)Q[k]=[];let QT=0,QN=0;
+const QKEYS=["ids","unkeep","kill","unkill","elok","unelok","eldead","uneldead","mok","unmok","mdead","unmdead","mseen","mdl"];const Q={move:{},mwhy:{}};for(const k of QKEYS)Q[k]=[];let QT=0,QN=0;
 function flag(ch){
   for(const id of ch.ids||[]){LOCAL.ok.add(id);LOCAL.dead.delete(id);}
   for(const id of ch.unkeep||[])LOCAL.ok.delete(id);
@@ -1108,7 +1119,7 @@ function flag(ch){
   QN++;clearTimeout(QT);if(QN>=15)flush();else QT=setTimeout(()=>flush(),2500);
 }
 function flush(beacon){
-  if(!QN)return;const body=JSON.stringify(Object.assign({key:AKEY()},Q));for(const k of QKEYS)Q[k]=[];Q.move={};QN=0;clearTimeout(QT);
+  if(!QN)return;const body=JSON.stringify(Object.assign({key:AKEY()},Q));for(const k of QKEYS)Q[k]=[];Q.move={};Q.mwhy={};QN=0;clearTimeout(QT);
   if(beacon&&navigator.sendBeacon)navigator.sendBeacon("/api/atlas/flags",new Blob([body],{type:"application/json"}));
   else fetch("/api/atlas/flags",{method:"POST",headers:{"content-type":"application/json"},body,keepalive:true}).catch(()=>{});
 }
@@ -1308,17 +1319,24 @@ function playEdit(id){
   el.addEventListener("click",e=>{const x=MONT[i];
     if(e.target.closest("[data-x]")){close();return;}
     if(e.target.closest("[data-keep]")){const on=mState(x.id)==="ok";flag(on?{unmok:[x.id]}:{mok:[x.id]});blip(on?300:880);draw();return;}
-    if(e.target.closest("[data-kill]")){   // delete = gone from the site + a "less like this" for its style, look and track
-      flag({mdead:[x.id]});blip(160);const g=document.querySelector('.mc[data-id="'+x.id+'"]');if(g)g.remove();
-      MONT.splice(i,1);if(!MONT.length){close();return;}i=i%MONT.length;draw();
-      const t=el.querySelector(".mtoast");t.classList.add("on");setTimeout(()=>t.classList.remove("on"),900);return;}
+    const wy=e.target.closest("[data-why]");
+    if(wy){const why=wy.dataset.why;el.querySelector(".mwhy").remove();if(why==="cancel")return;doDel(x,why);return;}
+    if(e.target.closest("[data-kill]")){   // downloaded first → just tidying; otherwise ask what was wrong
+      const dl=(FLAGS.mdl||[]).includes(x.id)||LOCAL.mdl.has(x.id);
+      if(dl){doDel(x,"none");return;}
+      const sh=document.createElement("div");sh.className="mwhy";sh.innerHTML='<p>What was wrong?</p><button type="button" data-why="song"><b>♪</b>The song</button><button type="button" data-why="video"><b>▣</b>The video</button><button type="button" data-why="both"><b>✕</b>Both</button><button type="button" class="c" data-why="cancel">Cancel</button>';
+      el.appendChild(sh);return;}
     if(e.target.closest("[data-prev]")){i=(i+MONT.length-1)%MONT.length;draw();return;}
     if(e.target.closest("[data-next]")){i=(i+1)%MONT.length;draw();return;}});
   // watched through once (it loops, so a wrap from the end back to the start) → after 48 h it is cleared unless kept or downloaded
   let lastT=0,sentFor="";
   el.addEventListener("timeupdate",e=>{const v=e.target;if(!adm||!v.duration)return;const x=MONT[i];
     if(sentFor!==x.id&&lastT>v.duration*.9&&v.currentTime<lastT-1){sentFor=x.id;flag({mseen:[x.id]});}lastT=v.currentTime;},true);
-  el.addEventListener("click",e=>{if(adm&&e.target.closest("a[download]"))flag({mdl:[MONT[i].id]});},true);
+  el.addEventListener("click",e=>{if(adm&&e.target.closest("a[download]")){LOCAL.mdl.add(MONT[i].id);flag({mdl:[MONT[i].id]});}},true);
+  function doDel(x,why){   // gone from the site + "less like this" for the song, the look, or both
+    Q.mwhy[x.id]=why;flag({mdead:[x.id]});blip(160);const g=document.querySelector('.mc[data-id="'+x.id+'"]');if(g)g.remove();
+    MONT.splice(i,1);if(!MONT.length){close();return;}i=i%MONT.length;draw();
+    const t=el.querySelector(".mtoast");t.textContent=why==="none"?"Deleted":why==="song"?"Deleted · less of that song":why==="video"?"Deleted · less of that look":"Deleted · less of both";t.classList.add("on");setTimeout(()=>t.classList.remove("on"),1100);}
   // swipe left/right = next/previous, swipe down = close
   let sx=0,sy=0,st0=0;
   el.addEventListener("touchstart",e=>{const t=e.touches[0];sx=t.clientX;sy=t.clientY;st0=Date.now();},{passive:true});

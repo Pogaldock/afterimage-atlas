@@ -16,7 +16,7 @@ import { isAdmin } from "./auth.js";
 //
 // Nothing here touches D1, Workers AI or Images. Crawling, scoring, dedupe and thumbnails run in curator/ on GitHub.
 
-const STYLES = ["inbox","crt","datamosh","analog","y2k","aero","vapor","weird","hyper","digi","witch","drain","mound","opium","goth","scene","black","death","sigil","punk","free","techno","digital","tech","factory","war","riot","drone","robot","alien","psych"];
+const STYLES = ["inbox","crt","datamosh","analog","y2k","aero","vapor","weird","hyper","digi","witch","drain","mound","opium","goth","scene","black","death","sigil","punk","free","techno","digital","tech","factory","war","riot","drone","robot","alien","psych","meme"];
 const CORS = { "access-control-allow-origin": "*", "access-control-allow-methods": "POST, GET, PUT, OPTIONS", "access-control-allow-headers": "content-type, authorization" };
 const json = (d, status = 200, extra = {}) => new Response(JSON.stringify(d), { status, headers: { "content-type": "application/json", ...CORS, ...extra } });
 const EXT = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif", "image/avif": "avif" };
@@ -74,7 +74,7 @@ async function writeManifest(env, m) { m.v = 3; m.count = Object.values(m.styles
 // ---------- flags: the only thing a triage session writes ----------
 async function flagsGet(env) {
   const [f, els] = await Promise.all([readJson(env, FKEY, emptyFlags()), readJson(env, EKEY, { items: [] })]);
-  return json({ ok: f.ok || [], dead: f.dead || [], moves: f.moves || {}, elok: f.elok || [], eldead: f.eldead || [], mok: f.mok || [], mdead: f.mdead || [], mseen: f.mseen || {}, mdl: f.mdl || [], els: els.items || [] }, 200, { "cache-control": "public, max-age=20" });
+  return json({ ok: f.ok || [], dead: f.dead || [], moves: f.moves || {}, elok: f.elok || [], eldead: f.eldead || [], mok: f.mok || [], mdead: f.mdead || [], mseen: f.mseen || {}, mdl: f.mdl || [], mwhy: f.mwhy || {}, els: els.items || [] }, 200, { "cache-control": "public, max-age=20" });
 }
 async function flagsPost(env, req) {
   const b = await req.json().catch(() => null);
@@ -108,6 +108,11 @@ async function flagsPost(env, req) {
   for (const id of b.mdl || []) if (idok(id)) mdl.add(String(id));
   const ids = Object.keys(ms); if (ids.length > 3000) for (const k of ids.sort((a, c) => ms[a] - ms[c]).slice(0, ids.length - 3000)) delete ms[k];
   f.mseen = ms; f.mdl = [...mdl].slice(-3000);
+  // why an edit was deleted: song (that track/artist), video (that style/look), both, or none (downloaded first: just tidying)
+  const why = (f.mwhy && typeof f.mwhy === "object") ? f.mwhy : {};
+  if (b.mwhy && typeof b.mwhy === "object") for (const [id, v] of Object.entries(b.mwhy)) if (idok(id) && ["song", "video", "both", "none"].includes(v)) why[String(id)] = v;
+  const wk = Object.keys(why); if (wk.length > 3000) for (const k of wk.slice(0, wk.length - 3000)) delete why[k];
+  f.mwhy = why;
   f.ok = [...ok]; f.dead = [...dead]; f.updated = now();
   await putJson(env, FKEY, f);
   return json({ ok: true, kept: f.ok.length, dead: f.dead.length, moves: Object.keys(f.moves).length, cand });
