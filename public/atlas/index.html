@@ -174,6 +174,20 @@ body.noscroll{overflow:hidden;touch-action:none}
 .mplay button,.mplay a.tbt{background:#1b1b1b;border:1px solid rgba(255,255,255,.25);color:#fff;padding:9px 14px;border-radius:999px;font:inherit;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;text-decoration:none}
 .mplay button.on{background:#7bf7ff;color:#000}.mplay button.kill.on{background:#ff4fd8}
 .mplay .x{margin-left:auto}
+.mplay .mbar{display:grid;grid-template-columns:repeat(var(--n,3),1fr);gap:10px;padding:10px 12px calc(12px + env(safe-area-inset-bottom))}
+.mplay .mbar>*{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:64px;padding:8px 6px;border-radius:16px;font-size:11px;letter-spacing:.08em}
+.mplay .mbar b{font-size:24px;line-height:1;font-family:system-ui,sans-serif;font-weight:700}
+.mplay .mbar .keep.on{background:#7bf7ff;color:#000;border-color:#7bf7ff}
+.mplay .mbar .del{background:#3a0b16;border-color:#ff3b6b;color:#ff8fa8}
+.mplay .mbar .dl{background:#0f2a12;border-color:#5dff7a;color:#b6ffc2}
+.mplay .mstage{position:relative;min-height:0;touch-action:pan-y}
+.mplay .mstage video{position:absolute;inset:0}
+.mplay .mnav{position:absolute;top:50%;transform:translateY(-50%);width:52px;height:88px;border-radius:14px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.2);font-size:26px;padding:0}
+.mplay .mnav.l{left:8px}.mplay .mnav.r{right:8px}
+.mplay .mtoast{position:absolute;left:50%;top:14px;transform:translateX(-50%);background:#ff3b6b;color:#fff;padding:8px 14px;border-radius:999px;font-size:12px;pointer-events:none;opacity:0;transition:opacity .2s}
+.mplay .mtoast.on{opacity:1}
+.mplay .mh button{min-width:44px;min-height:44px;font-size:16px}
+@media (hover:none){.mplay .mnav{display:none}}
 .egrid .el{margin:0;position:relative;border-radius:8px;overflow:hidden;background:conic-gradient(#2a2a2a 25%,#444 0 50%,#2a2a2a 0 75%,#444 0) 0 0/18px 18px;aspect-ratio:1;display:grid;place-items:center;cursor:zoom-in}
 .egrid .el img{max-width:92%;max-height:92%;object-fit:contain}
 .egrid .el figcaption{position:absolute;left:0;right:0;bottom:0;padding:4px 8px;font-family:var(--f-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;background:rgba(0,0,0,.6);color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1272,7 +1286,7 @@ async function mountMap(){
 // ---------- Edits: nightly montages (track + library + lines), keep/kill trains the next night's rolls ----------
 const mState=id=>LOCAL.mok.has(id)?"ok":LOCAL.mdead.has(id)?"dead":(FLAGS.mok||[]).includes(id)?"ok":(FLAGS.mdead||[]).includes(id)?"dead":"";
 function editsHTML(){
-  const items=MONT.filter(x=>mState(x.id)!=="dead"||ADM);const per={};for(const x of items)per[x.style]=(per[x.style]||0)+1;
+  const items=MONT.filter(x=>mState(x.id)!=="dead");const per={};for(const x of items)per[x.style]=(per[x.style]||0)+1;
   const chips='<button type="button" data-f="" class="on">All · '+items.length+'</button>'+Object.keys(per).map(k=>'<button type="button" data-f="'+k+'">'+(byId[k]?byId[k].name:k)+' · '+per[k]+'</button>').join("");
   return '<article class="sp edits"><header class="hero"><p class="kick">Edits</p><h1 class="t">Montages</h1><p class="lead">Made overnight: a track pulled for the style, the cut-outs and the images kept here, one of the lines, cut on the onsets with real datamosh between shots. New ones every night; '+(ADM?'keep or kill each one and the next night rolls more of what you kept.':'nothing here is hand-edited.')+'</p></header>'
     +'<div class="chips" id="mchips">'+chips+'</div>'
@@ -1283,13 +1297,21 @@ function playEdit(id){
   const el=document.createElement("div");el.className="mplay";document.body.classList.add("noscroll");
   function draw(){const x=MONT[i];const st=mState(x.id);lastT=0;
     el.innerHTML='<div class="mh"><span>'+esc(byId[x.style]?byId[x.style].name:x.style)+' · '+esc(x.track&&x.track.title||"")+(x.line?' · “'+esc(x.line)+'”':'')+'</span><button type="button" class="x" data-prev>‹</button><button type="button" data-next>›</button><button type="button" data-x>✕</button></div>'
-      +'<video src="'+esc(x.mp4)+'" poster="'+esc(x.poster)+'" playsinline controls autoplay loop></video>'
-      +'<div class="mf">'+(adm?'<button type="button" class="keep'+(st==="ok"?" on":"")+'" data-keep>Keep</button><button type="button" class="kill'+(st==="dead"?" on":"")+'" data-kill>Kill</button>':'')+'<a class="tbt" href="'+esc(x.mp4)+'" download="afterimage-'+esc(x.style)+'-'+x.id.slice(0,6)+'.mp4">Download</a>'+(x.track&&x.track.url?'<a class="tbt" href="'+esc(x.track.url)+'" target="_blank" rel="noopener">Track ↗</a>':'')+'</div>';
+      +'<div class="mstage"><video src="'+esc(x.mp4)+'" poster="'+esc(x.poster)+'" playsinline autoplay loop></video><button type="button" class="mnav l" data-prev>‹</button><button type="button" class="mnav r" data-next>›</button><div class="mtoast">Deleted · less like this</div></div>'
+      +'<div class="mbar" style="--n:'+(adm?3:2)+'">'
+      +(adm?'<button type="button" class="del" data-kill><b>✕</b>Delete</button>':'')
+      +'<a class="tbt dl" href="'+esc(x.mp4)+'" download="afterimage-'+esc(x.style)+'-'+x.id.slice(0,6)+'.mp4"><b>↓</b>Download</a>'
+      +(adm?'<button type="button" class="keep'+(st==="ok"?" on":"")+'" data-keep><b>♥</b>'+(st==="ok"?"Kept":"Keep")+'</button>':(x.track&&x.track.url?'<a class="tbt" href="'+esc(x.track.url)+'" target="_blank" rel="noopener"><b>♪</b>Track</a>':''))
+      +'</div>';
+    const v=el.querySelector("video");v.addEventListener("click",()=>{v.paused?v.play():v.pause();});
     const g=document.querySelector('.mc[data-id="'+x.id+'"]');if(g)g.className="mc "+st;}
   el.addEventListener("click",e=>{const x=MONT[i];
     if(e.target.closest("[data-x]")){close();return;}
     if(e.target.closest("[data-keep]")){const on=mState(x.id)==="ok";flag(on?{unmok:[x.id]}:{mok:[x.id]});blip(on?300:880);draw();return;}
-    if(e.target.closest("[data-kill]")){const on=mState(x.id)==="dead";flag(on?{unmdead:[x.id]}:{mdead:[x.id]});blip(on?300:160);draw();return;}
+    if(e.target.closest("[data-kill]")){   // delete = gone from the site + a "less like this" for its style, look and track
+      flag({mdead:[x.id]});blip(160);const g=document.querySelector('.mc[data-id="'+x.id+'"]');if(g)g.remove();
+      MONT.splice(i,1);if(!MONT.length){close();return;}i=i%MONT.length;draw();
+      const t=el.querySelector(".mtoast");t.classList.add("on");setTimeout(()=>t.classList.remove("on"),900);return;}
     if(e.target.closest("[data-prev]")){i=(i+MONT.length-1)%MONT.length;draw();return;}
     if(e.target.closest("[data-next]")){i=(i+1)%MONT.length;draw();return;}});
   // watched through once (it loops, so a wrap from the end back to the start) → after 48 h it is cleared unless kept or downloaded
@@ -1297,6 +1319,12 @@ function playEdit(id){
   el.addEventListener("timeupdate",e=>{const v=e.target;if(!adm||!v.duration)return;const x=MONT[i];
     if(sentFor!==x.id&&lastT>v.duration*.9&&v.currentTime<lastT-1){sentFor=x.id;flag({mseen:[x.id]});}lastT=v.currentTime;},true);
   el.addEventListener("click",e=>{if(adm&&e.target.closest("a[download]"))flag({mdl:[MONT[i].id]});},true);
+  // swipe left/right = next/previous, swipe down = close
+  let sx=0,sy=0,st0=0;
+  el.addEventListener("touchstart",e=>{const t=e.touches[0];sx=t.clientX;sy=t.clientY;st0=Date.now();},{passive:true});
+  el.addEventListener("touchend",e=>{if(e.target.closest(".mbar,.mh"))return;const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;if(Date.now()-st0>700)return;
+    if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.3){i=dx<0?(i+1)%MONT.length:(i+MONT.length-1)%MONT.length;blip(520);draw();}
+    else if(dy>90&&Math.abs(dy)>Math.abs(dx)*1.5)close();},{passive:true});
   function onkey(e){if(e.key==="Escape")close();else if(e.key==="ArrowRight"){i=(i+1)%MONT.length;draw();}else if(e.key==="ArrowLeft"){i=(i+MONT.length-1)%MONT.length;draw();}}
   function close(){flush();document.removeEventListener("keydown",onkey);const v=el.querySelector("video");if(v){v.pause();v.removeAttribute("src");v.load();}el.remove();document.body.classList.remove("noscroll");}
   document.addEventListener("keydown",onkey);draw();document.body.appendChild(el);
