@@ -45,6 +45,18 @@ function okTok(env, req) {
 // ---------- small JSON objects in R2 ----------
 async function readJson(env, key, fallback) { const o = await env.STORE.get(key); if (o) { try { const j = await o.json(); if (j) return j; } catch {} } return fallback; }
 const putJson = (env, key, v) => env.STORE.put(key, JSON.stringify(v), { httpMetadata: { contentType: "application/json" } });
+// read-modify-write that can't lose a concurrent update: the write only lands if nobody wrote in between, else re-read and redo
+async function casJson(env, key, fallback, mutate) {
+  for (let i = 0; i < 10; i++) {
+    const o = await env.STORE.get(key); let v = JSON.parse(JSON.stringify(fallback));
+    if (o) { try { v = (await o.json()) || v; } catch {} }
+    const out = await mutate(v);
+    const opts = { httpMetadata: { contentType: "application/json" } }; if (o) opts.onlyIf = { etagMatches: o.etag };
+    if (await env.STORE.put(key, JSON.stringify(out), opts)) return out;
+    await new Promise((r) => setTimeout(r, 30 + Math.random() * 90 * (i + 1)));
+  }
+  throw new Error("busy, try again");
+}
 const MKEY = "atlas/manifest.json", FKEY = "atlas/flags.json", EKEY = "atlas/elements.json";
 const emptyFlags = () => ({ ok: [], dead: [], moves: {}, els: [] });
 
@@ -79,42 +91,46 @@ async function flagsGet(env) {
 async function flagsPost(env, req) {
   const b = await req.json().catch(() => null);
   if (!b || !(await okKey(env, b.key, req))) return json({ error: "not logged in" }, 403);
-  const f = Object.assign(emptyFlags(), await readJson(env, FKEY, {}));
-  const ok = new Set(f.ok), dead = new Set(f.dead), idok = (x) => /^[a-f0-9]{20}$/.test(String(x));
-  for (const id of b.ids || []) if (idok(id)) { ok.add(String(id)); dead.delete(String(id)); }
-  for (const id of b.unkeep || []) ok.delete(String(id));
-  for (const id of b.kill || []) if (idok(id)) { dead.add(String(id)); ok.delete(String(id)); }
-  for (const id of b.unkill || []) dead.delete(String(id));
-  for (const [id, st] of Object.entries(b.move || {})) if (idok(id) && STYLES.includes(st)) f.moves[String(id)] = st;
-  // element candidates (auto cut-outs): elok = promote to the library, eldead = discard
-  const eok = new Set(f.elok || []), edead = new Set(f.eldead || []);
-  for (const id of b.elok || []) if (idok(id)) { eok.add(String(id)); edead.delete(String(id)); }
-  for (const id of b.unelok || []) eok.delete(String(id));
-  for (const id of b.eldead || []) if (idok(id)) { edead.add(String(id)); eok.delete(String(id)); }
-  for (const id of b.uneldead || []) edead.delete(String(id));
-  let cand = null;
-  try { cand = await applyCands(env, [...eok], [...edead]); eok.clear(); edead.clear(); } catch (e) { cand = { error: String(e && e.message || e) }; }
-  f.elok = [...eok]; f.eldead = [...edead];
-  // montages (nightly edits): mok = keep, mdead = kill — trains which recipes/tracks get more rolls, kills leave the bundle next build
-  const mok = new Set(f.mok || []), mdead = new Set(f.mdead || []);
-  for (const id of b.mok || []) if (idok(id)) { mok.add(String(id)); mdead.delete(String(id)); }
-  for (const id of b.unmok || []) mok.delete(String(id));
-  for (const id of b.mdead || []) if (idok(id)) { mdead.add(String(id)); mok.delete(String(id)); }
-  for (const id of b.unmdead || []) mdead.delete(String(id));
-  f.mok = [...mok]; f.mdead = [...mdead];
-  // watched edits: mseen = when he last played one through, mdl = downloaded (never pruned)
-  const ms = (f.mseen && typeof f.mseen === "object") ? f.mseen : {}, mdl = new Set(f.mdl || []);
-  for (const id of b.mseen || []) if (idok(id)) ms[String(id)] = now();
-  for (const id of b.mdl || []) if (idok(id)) mdl.add(String(id));
-  const ids = Object.keys(ms); if (ids.length > 3000) for (const k of ids.sort((a, c) => ms[a] - ms[c]).slice(0, ids.length - 3000)) delete ms[k];
-  f.mseen = ms; f.mdl = [...mdl].slice(-3000);
-  // why an edit was deleted: song (that track/artist), video (that style/look), both, or none (downloaded first: just tidying)
-  const why = (f.mwhy && typeof f.mwhy === "object") ? f.mwhy : {};
-  if (b.mwhy && typeof b.mwhy === "object") for (const [id, v] of Object.entries(b.mwhy)) if (idok(id) && ["song", "video", "both", "none"].includes(v)) why[String(id)] = v;
-  const wk = Object.keys(why); if (wk.length > 3000) for (const k of wk.slice(0, wk.length - 3000)) delete why[k];
-  f.mwhy = why;
-  f.ok = [...ok]; f.dead = [...dead]; f.updated = now();
-  await putJson(env, FKEY, f);
+  const idok = (x) => /^[a-f0-9]{20}$/.test(String(x));
+  // element candidates (auto cut-outs): promote to the library / discard, applied straight away
+  const pro = (b.elok || []).filter(idok).map(String), dis = (b.eldead || []).filter(idok).map(String);
+  let cand = null, candFailed = false;
+  if (pro.length || dis.length) { try { cand = await applyCands(env, pro, dis); } catch (e) { cand = { error: String(e && e.message || e) }; candFailed = true; } }
+  const f = await casJson(env, FKEY, {}, (f0) => {
+    const f = Object.assign(emptyFlags(), f0);
+    const ok = new Set(f.ok), dead = new Set(f.dead);
+    for (const id of b.ids || []) if (idok(id)) { ok.add(String(id)); dead.delete(String(id)); }
+    for (const id of b.unkeep || []) ok.delete(String(id));
+    for (const id of b.kill || []) if (idok(id)) { dead.add(String(id)); ok.delete(String(id)); }
+    for (const id of b.unkill || []) dead.delete(String(id));
+    f.moves = f.moves || {}; for (const [id, st] of Object.entries(b.move || {})) if (idok(id) && STYLES.includes(st)) f.moves[String(id)] = st;
+    const eok = new Set(f.elok || []), edead = new Set(f.eldead || []);       // only kept if applying them failed: retried by the next call or the curator
+    if (candFailed) { for (const id of pro) { eok.add(id); edead.delete(id); } for (const id of dis) { edead.add(id); eok.delete(id); } }
+    else { for (const id of pro) eok.delete(id); for (const id of dis) edead.delete(id); }
+    for (const id of b.unelok || []) eok.delete(String(id));
+    for (const id of b.uneldead || []) edead.delete(String(id));
+    f.elok = [...eok]; f.eldead = [...edead];
+    // montages: mok = keep, mdead = delete
+    const mok = new Set(f.mok || []), mdead = new Set(f.mdead || []);
+    for (const id of b.mok || []) if (idok(id)) { mok.add(String(id)); mdead.delete(String(id)); }
+    for (const id of b.unmok || []) mok.delete(String(id));
+    for (const id of b.mdead || []) if (idok(id)) { mdead.add(String(id)); mok.delete(String(id)); }
+    for (const id of b.unmdead || []) mdead.delete(String(id));
+    f.mok = [...mok]; f.mdead = [...mdead];
+    // watched edits: mseen = when he last played one through, mdl = downloaded (never pruned)
+    const ms = (f.mseen && typeof f.mseen === "object") ? f.mseen : {}, mdl = new Set(f.mdl || []);
+    for (const id of b.mseen || []) if (idok(id)) ms[String(id)] = now();
+    for (const id of b.mdl || []) if (idok(id)) mdl.add(String(id));
+    const ids = Object.keys(ms); if (ids.length > 3000) for (const k of ids.sort((a, c) => ms[a] - ms[c]).slice(0, ids.length - 3000)) delete ms[k];
+    f.mseen = ms; f.mdl = [...mdl].slice(-3000);
+    // why an edit was deleted: song, video, both, or none (downloaded first: just tidying)
+    const why = (f.mwhy && typeof f.mwhy === "object") ? f.mwhy : {};
+    if (b.mwhy && typeof b.mwhy === "object") for (const [id, v] of Object.entries(b.mwhy)) if (idok(id) && ["song", "video", "both", "none"].includes(v)) why[String(id)] = v;
+    const wk = Object.keys(why); if (wk.length > 3000) for (const k of wk.slice(0, wk.length - 3000)) delete why[k];
+    f.mwhy = why;
+    f.ok = [...ok]; f.dead = [...dead]; f.updated = now();
+    return f;
+  });
   return json({ ok: true, kept: f.ok.length, dead: f.dead.length, moves: Object.keys(f.moves).length, cand });
 }
 
@@ -181,32 +197,33 @@ async function candPut(env, req) {
 // Promote reviewed candidates into the library and drop discarded ones. Called the moment a review decision
 // arrives (flagsPost) and again by the curator as a backstop.
 async function applyCands(env, promote, discard) {
-  const c = await readJson(env, CKEY, { items: [] }); const e = await readJson(env, EKEY, { items: [] });
   const ok = new Set((promote || []).map(String)), dead = new Set((discard || []).map(String));
-  if (!ok.size && !dead.size) return { promoted: 0, discarded: 0, pending: c.items.length };
-  let promoted = 0, discarded = 0; const keep = [];
-  for (const it of c.items) {
-    if (ok.has(it.id)) {
-      const o = await env.STORE.get("atlas/cand/" + it.id + ".png");
-      if (o) { await env.STORE.put("atlas/el/" + it.id + ".png", o.body, { httpMetadata: { contentType: "image/png" } }); await env.STORE.delete("atlas/cand/" + it.id + ".png").catch(() => {}); }
-      if (!e.items.some((x) => x.id === it.id)) e.items.unshift({ id: it.id, from: it.from, style: it.style, kind: it.kind, tag: it.kind, w: it.w, h: it.h, auto: 1, added: now(), url: "/api/atlas/el/" + it.id });
-      promoted++; continue;
-    }
-    if (dead.has(it.id)) { await env.STORE.delete("atlas/cand/" + it.id + ".png").catch(() => {}); discarded++; continue; }
-    keep.push(it);
+  const c0 = await readJson(env, CKEY, { items: [] });
+  if (!ok.size && !dead.size) return { promoted: 0, discarded: 0, pending: c0.items.length };
+  const byId = new Map(c0.items.map((it) => [it.id, it])); const moved = [];
+  for (const id of ok) {                                                  // copy the cut-out into the library (safe to repeat)
+    const it = byId.get(id); if (!it) continue;
+    const o = await env.STORE.get("atlas/cand/" + id + ".png");
+    if (o) { await env.STORE.put("atlas/el/" + id + ".png", o.body, { httpMetadata: { contentType: "image/png" } }); }
+    moved.push(it);
   }
-  c.items = keep; await putJson(env, CKEY, c); await putJson(env, EKEY, e);
-  if (promoted || discarded) {
-    const h = await readJson(env, "atlas/elhist.json", { ok: [], dead: [] });
+  await casJson(env, EKEY, { items: [] }, (e) => {
+    for (const it of moved) if (!e.items.some((x) => x.id === it.id)) e.items.unshift({ id: it.id, from: it.from, style: it.style, kind: it.kind, tag: it.kind, w: it.w, h: it.h, auto: 1, added: now(), url: "/api/atlas/el/" + it.id });
+    return e;
+  });
+  let pending = 0;
+  await casJson(env, CKEY, { items: [] }, (c) => { c.items = c.items.filter((it) => !ok.has(it.id) && !dead.has(it.id)); pending = c.items.length; return c; });
+  for (const id of [...ok, ...dead]) await env.STORE.delete("atlas/cand/" + id + ".png").catch(() => {});
+  await casJson(env, "atlas/elhist.json", { ok: [], dead: [] }, (h) => {
     const hok = new Set(h.ok), hdead = new Set(h.dead); for (const id of ok) { hok.add(id); hdead.delete(id); } for (const id of dead) { hdead.add(id); hok.delete(id); }
-    h.ok = [...hok]; h.dead = [...hdead]; await putJson(env, "atlas/elhist.json", h);
-  }
-  return { promoted, discarded, pending: keep.length };
+    h.ok = [...hok]; h.dead = [...hdead]; return h;
+  });
+  return { promoted: moved.length, discarded: dead.size, pending };
 }
 async function candApply(env, req) {
   const b = await req.json().catch(() => null); if (!b) return json({ error: "bad json" }, 400);
   const r = await applyCands(env, b.promote || [], b.discard || []);
-  if (b.clearFlags) { const f = Object.assign(emptyFlags(), await readJson(env, FKEY, {})); const ok = new Set(b.promote || []), dead = new Set(b.discard || []); f.elok = (f.elok || []).filter((id) => !ok.has(id)); f.eldead = (f.eldead || []).filter((id) => !dead.has(id)); await putJson(env, FKEY, f); }
+  if (b.clearFlags) { const ok = new Set(b.promote || []), dead = new Set(b.discard || []); await casJson(env, FKEY, {}, (f0) => { const f = Object.assign(emptyFlags(), f0); f.elok = (f.elok || []).filter((id) => !ok.has(id)); f.eldead = (f.eldead || []).filter((id) => !dead.has(id)); return f; }); }
   return json({ ok: true, ...r });
 }
 
@@ -289,9 +306,7 @@ async function verdicts(env, req) {
   }
   await writeManifest(env, m);
   if (b.clearFlags) {
-    const f = Object.assign(emptyFlags(), await readJson(env, FKEY, {}));
-    f.dead = f.dead.filter((id) => !kill.has(id)); for (const id of Object.keys(move)) delete f.moves[id];
-    await putJson(env, FKEY, f);
+    await casJson(env, FKEY, {}, (f0) => { const f = Object.assign(emptyFlags(), f0); f.dead = f.dead.filter((id) => !kill.has(id)); f.moves = f.moves || {}; for (const id of Object.keys(move)) delete f.moves[id]; return f; });
   }
   return json({ ok: true, killed, moved, count: m.count });
 }

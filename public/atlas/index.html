@@ -1123,10 +1123,13 @@ function flag(ch){
   for(const [id,st] of Object.entries(ch.move||{})){LOCAL.moves[id]=st;Q.move[id]=st;}
   QN++;clearTimeout(QT);if(QN>=15)flush();else QT=setTimeout(()=>flush(),2500);
 }
+let SAVING=Promise.resolve();
 function flush(beacon){
   if(!QN)return;const body=JSON.stringify(Object.assign({key:AKEY()},Q));for(const k of QKEYS)Q[k]=[];Q.move={};Q.mwhy={};QN=0;clearTimeout(QT);
-  if(beacon&&navigator.sendBeacon)navigator.sendBeacon("/api/atlas/flags",new Blob([body],{type:"application/json"}));
-  else fetch("/api/atlas/flags",{method:"POST",headers:{"content-type":"application/json"},body,keepalive:true}).catch(()=>{});
+  // one save at a time from this page (the server is safe either way); a failed save is retried, never dropped
+  if(beacon&&navigator.sendBeacon){navigator.sendBeacon("/api/atlas/flags",new Blob([body],{type:"application/json"}));return;}
+  const send=(n)=>fetch("/api/atlas/flags",{method:"POST",headers:{"content-type":"application/json"},body,keepalive:true}).then(r=>{if(!r.ok&&r.status!==403)throw 0;}).catch(()=>{if(n<4)return new Promise(res=>setTimeout(res,800*(n+1))).then(()=>send(n+1));});
+  SAVING=SAVING.then(()=>send(0));
 }
 addEventListener("pagehide",()=>flush(true));document.addEventListener("visibilitychange",()=>{if(document.hidden)flush(true);});
 
