@@ -39,8 +39,9 @@ jobs:
           e = json.load(get("/atlas/elements.json")).get("items", []); print(f"- elements: {len(e)}")
           if e: print(f"- element file → {get('/atlas/el/' + e[0]['id'] + '.webp').status}")
           mt = json.load(get("/atlas/mont.json")).get("items", []); print(f"- edits: {len(mt)}")
-          if mt:
-              r = get(mt[0]["mp4"]); print(f"- edit video → {r.status} {r.headers.get('content-type')} {r.headers.get('content-length')}B")
+          for it_ in mt[:4] + mt[40:42]:
+              try: r = get(it_["mp4"]); print(f"- edit video `{it_['mp4']}` made {it_.get('made')} → {r.status} {r.headers.get('content-length')}B")
+              except Exception as e_: print(f"- edit video `{it_.get('mp4')}` made {it_.get('made')} → {getattr(e_, 'code', e_)}")
           PY
       - name: video upload plumbing (start, one part, abort, leaves nothing behind)
         if: always()
