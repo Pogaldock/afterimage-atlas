@@ -55,6 +55,8 @@ jobs:
           P=$(curl -s -X PUT -H "$H" --data-binary @/tmp/part "$S/api/atlas/vid/part?key=$K&up=$U&n=1")
           A=$(curl -s -X POST -H "$H" -H "content-type: application/json" -d "{\"key\":\"$K\",\"up\":\"$U\"}" $S/api/atlas/vid/abort)
           echo "- video upload: start → ${K:+ok} | part → $P | abort → $A" >> $O
+          curl -s -H "$H" "$S/api/atlas/cur/obj?o=atlas/static.json" | python3 -c "import sys,json;d=json.load(sys.stdin);print('- static.json: built', d.get('built'), 'mont_at', d.get('mont_at'), 'parts', [(p['key'], p.get('bytes')) for p in d.get('parts', []) if '9' in p['key'][-8:-4]][:6], 'n', len(d.get('parts', [])))" >> $O
+          for id in $(curl -s $S/atlas/mont.json | python3 -c "import sys,json;print(' '.join(x['id'] for x in json.load(sys.stdin)['items'][:3]))"); do echo "- R2 mont/$id.mp4 → $(curl -s -o /dev/null -w '%{http_code} %{size_download}B' -H "$H" "$S/api/atlas/cur/obj?o=atlas/mont/$id.mp4")" >> $O; done
       - name: commit report
         if: always()
         env:
