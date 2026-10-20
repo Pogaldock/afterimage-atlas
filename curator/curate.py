@@ -464,7 +464,7 @@ def bundle(st):
         md = os.path.join(st.bundle, "mont"); os.makedirs(md, exist_ok=True); shown = []
         for m in mont:
             if m["id"] in mdead: continue
-            if m["id"] not in mok and m["id"] not in mdl and time.time() - mseen.get(m["id"], 1e12) > 48 * 3600: continue   # watched, left: gone
+            if m["id"] not in mok and m["id"] not in mdl and time.time() - mseen.get(m["id"], 1e12) > 3600: continue   # seen and left: the edits job archives it
             for ext, key in (("mp4", f"atlas/mont/{m['id']}.mp4"), ("jpg", f"atlas/mont/{m['id']}.jpg")):
                 fp = os.path.join(md, f"{m['id']}.{ext}")
                 if not os.path.exists(fp):
