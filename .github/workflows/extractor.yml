@@ -2,19 +2,19 @@
 name: atlas extractor
 on:
   schedule:
-    - cron: "50 2-23/4 * * *"   # every 4 hours
+    - cron: "50 */2 * * *"   # every 2 hours
   workflow_dispatch:
     inputs:
       cap:
         description: "images to process this run"
-        default: "180"
+        default: "500"
 permissions:
   contents: write
 concurrency: extractor
 jobs:
   extract:
     runs-on: ubuntu-latest
-    timeout-minutes: 75
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
         with:
@@ -35,7 +35,7 @@ jobs:
       - name: extract
         env:
           ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
-          EXTRACT_CAP: ${{ github.event.inputs.cap || '180' }}
+          EXTRACT_CAP: ${{ github.event.inputs.cap || '500' }}
         run: '[[ "$EXTRACT_CAP" =~ ^[0-9]{1,4}$ ]] && python curator/extract.py --cap "$EXTRACT_CAP"'
       - name: commit run report
         continue-on-error: true
