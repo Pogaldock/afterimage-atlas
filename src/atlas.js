@@ -228,6 +228,17 @@ async function candApply(env, req) {
 }
 
 // ---------- originals ----------
+// the archive: every edit you've seen, kept small (720p) so it never fills the free storage. Served from R2 with ranges so it streams.
+async function archFile(env, req, id, ext) {
+  const key = "atlas/arch/" + id + "." + ext, rng = req.headers.get("range");
+  let range; const m = rng && /^bytes=(\d+)-(\d*)$/.exec(rng);
+  if (m) range = m[2] ? { offset: +m[1], length: +m[2] - +m[1] + 1 } : { offset: +m[1] };
+  const o = await env.STORE.get(key, range ? { range } : {});
+  if (!o) return new Response("gone", { status: 404 });
+  const h = { "content-type": ext === "mp4" ? "video/mp4" : "image/jpeg", "accept-ranges": "bytes", "cache-control": "public, max-age=31536000, immutable", ...SAFE };
+  if (range && o.range) { const off = o.range.offset || 0, len = o.range.length ?? (o.size - off); h["content-range"] = `bytes ${off}-${off + len - 1}/${o.size}`; h["content-length"] = String(len); return new Response(o.body, { status: 206, headers: h }); }
+  h["content-length"] = String(o.size); return new Response(o.body, { headers: h });
+}
 async function file(env, rest) {
   const o = await env.STORE.get("atlas/" + rest);
   if (!o) return new Response("gone", { status: 404 });
@@ -245,7 +256,7 @@ async function stats(env) {
 }
 
 // ---------- curator endpoints (GitHub Action) ----------
-const OBJ_OK = /^atlas\/(clip\.(json|npz)|elclip\.npz|curator\.json|extractor\.json|flags\.json|manifest\.json|elements\.json|cands\.json|extracted\.json|seen\.json|killed\.json|qstats\.json|qtallied\.json|elhist\.json|static\.tar|static-\d+\.tar|static\.json|mont\.json|montage\.json|mont\/[a-z0-9]+\.(mp4|jpg))$/;
+const OBJ_OK = /^atlas\/(clip\.(json|npz)|elclip\.npz|curator\.json|extractor\.json|flags\.json|manifest\.json|elements\.json|cands\.json|extracted\.json|seen\.json|killed\.json|qstats\.json|qtallied\.json|elhist\.json|static\.tar|static-\d+\.tar|static\.json|mont\.json|montage\.json|mont\/[a-z0-9]+\.(mp4|jpg)|arch\/[a-z0-9]+\.(mp4|jpg)|arch\.json)$/;
 async function objGet(env, key) {
   if (!OBJ_OK.test(key)) return json({ error: "key not allowed" }, 400);
   const o = await env.STORE.get(key);
@@ -333,7 +344,7 @@ export async function handleAtlas(req, env) {
     if (sub === "obj" && req.method === "GET") return objGet(env, (url.searchParams.get("o") || url.searchParams.get("key") || ""));
     if (sub === "obj" && req.method === "PUT") return objPut(env, req, (url.searchParams.get("o") || url.searchParams.get("key") || ""));
     if (sub === "obj" && req.method === "DELETE") {   // only pruned edits can be deleted, nothing else
-      const k = url.searchParams.get("o") || ""; if (!/^atlas\/mont\/[a-z0-9]+\.(mp4|jpg)$/.test(k)) return json({ error: "key not allowed" }, 400);
+      const k = url.searchParams.get("o") || ""; if (!/^atlas\/(mont|arch)\/[a-z0-9]+\.(mp4|jpg)$/.test(k)) return json({ error: "key not allowed" }, 400);
       await env.STORE.delete(k); return json({ ok: true });
     }
     if (sub === "put" && req.method === "POST") return putMany(env, req);
@@ -354,6 +365,8 @@ export async function handleAtlas(req, env) {
   let m;
   if ((m = /^\/api\/atlas\/el\/([a-f0-9]{20})$/.exec(p)) && req.method === "GET") return elGet(env, m[1]);
   if ((m = /^\/api\/atlas\/cand\/([a-f0-9]{20})$/.exec(p)) && req.method === "GET") return candGet(env, m[1]);
+  if ((m = /^\/api\/atlas\/arch\/([a-f0-9]{20})\.(mp4|jpg)$/.exec(p)) && req.method === "GET") return archFile(env, req, m[1], m[2]);
+  if (p === "/api/atlas/arch" && req.method === "GET") { const a = await readJson(env, "atlas/arch.json", { items: [] }); return json(a, 200, { "cache-control": "public, max-age=60" }); }
   if ((m = /^\/api\/atlas\/f\/([a-z0-9-]+\/[a-f0-9]{20}\.[a-z0-9]+)$/.exec(p)) && req.method === "GET") return file(env, m[1]);
   if ((m = /^\/api\/atlas\/t\/([a-f0-9]{20})$/.exec(p)) && req.method === "GET") { // legacy thumb URL → static
     return Response.redirect(url.origin + "/atlas/t/" + m[1] + ".webp", 302);
