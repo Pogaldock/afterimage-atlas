@@ -27,7 +27,7 @@ jobs:
           m = json.load(get("/atlas/manifest.json")); st = m.get("styles", m)
           n = sum(len(v) for v in st.values()); print(f"\n- manifest: {n} images in {len(st)} styles")
           h = get("/atlas/").read().decode()
-          print("- page has: archive=" + str("march" in h) + " new-label=" + str("New · " in h) + " seen3s=" + str("Math.min(3,v.duration" in h) + " safe-saves=" + str("SAVING=" in h))
+          print("- page has: archive=" + str("march" in h) + " new-label=" + str("New · " in h) + " seen3s=" + str("Math.min(3,v.duration" in h) + " safe-saves=" + str("SAVING=" in h) + " seen-strip=" + str("mseenh" in h))
           print("- memes: " + str(len(st.get("meme", []))) + ", pop culture: " + str(len(st.get("pop", []))))
           first = next(iter(st.values()))[0]; th = first.get("th") or first.get("url")
           print(f"- thumbnail `{th}` → {get(th).status}")
