@@ -317,7 +317,7 @@ def source(st, run_no):
                 b = fetch(c[0], referer=c[1], headers=c[2].get("headers")); im = load_image(b)
                 return (c, b, im) if size_ok(im) else None
             except Exception: return None
-        with ThreadPoolExecutor(4) as ex: got = [g for g in ex.map(dl, cands) if g]
+        with ThreadPoolExecutor(16) as ex: got = [g for g in ex.map(dl, cands) if g]   # many slow hosts: wait on 16 at once
         downloaded += len(got)
         if not got: continue
         E = embed_images([g[2] for g in got]); sc = style_scores(st, E)[style]; n0 = len(uploads)
