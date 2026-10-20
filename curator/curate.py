@@ -460,6 +460,7 @@ def bundle(st):
         if (f.endswith(".webp") and f[:-5] not in live_el) or f.endswith(".png"): os.remove(os.path.join(st.bundle, "el", f))
     # montages (nightly edits from montage.py): mp4 + poster into the bundle, killed ones dropped from the site
     try:
+        st.mont_at = int(time.time())                                   # the edit list as of now: anything published later is not in this bundle
         mont = json.loads(obj_get("atlas/mont.json") or '{"items":[]}').get("items", []); mdead = set(st.flags.get("mdead", [])); mok = set(st.flags.get("mok", [])); mdl = set(st.flags.get("mdl", [])); mseen = st.flags.get("mseen") or {}
         md = os.path.join(st.bundle, "mont"); os.makedirs(md, exist_ok=True); shown = []
         for m in mont:
@@ -502,7 +503,7 @@ def bundle(st):
         if tf is None: buf = io.BytesIO(); tf = tarfile.open(fileobj=buf, mode="w", format=tarfile.USTAR_FORMAT)
         tf.add(path, arcname=arc); size += n + 512
     close_part()
-    obj_put("atlas/static.json", json.dumps({"v": 1, "built": int(time.time()), "parts": parts}), "application/json")   # montage parts (static-9NN) are superseded: mont/ is in these
+    obj_put("atlas/static.json", json.dumps({"v": 1, "built": int(time.time()), "mont_at": getattr(st, "mont_at", 0), "parts": parts}), "application/json")   # montage parts (static-9NN) are superseded: mont/ is in these
     report["bundle"] = {"images": sum(len(a) for a in styles.values()), "thumbs": len(os.listdir(os.path.join(st.bundle, "t"))), "elements": len(els), "parts": len(parts), "mb": round(sum(p["bytes"] for p in parts) / 1e6, 1)}
     log("bundle:", report["bundle"])
 
