@@ -25,6 +25,7 @@ jobs:
           def get(u): return urllib.request.urlopen(urllib.request.Request(S + u, headers={"user-agent": "atlas-check"}), timeout=30)
           m = json.load(get("/atlas/manifest.json")); st = m.get("styles", m)
           n = sum(len(v) for v in st.values()); print(f"\n- manifest: {n} images in {len(st)} styles")
+          print("- memes: " + str(len(st.get("meme", []))) + ", pop culture: " + str(len(st.get("pop", []))))
           first = next(iter(st.values()))[0]; th = first.get("th") or first.get("url")
           print(f"- thumbnail `{th}` → {get(th).status}")
           o = first.get("url"); print(f"- original `{o}` → {get(o).status}")
