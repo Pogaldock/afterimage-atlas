@@ -43,6 +43,7 @@ jobs:
               r = get(mt[0]["mp4"]); print(f"- edit video → {r.status} {r.headers.get('content-type')} {r.headers.get('content-length')}B")
           PY
       - name: video upload plumbing (start, one part, abort, leaves nothing behind)
+        if: always()
         env:
           ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
         run: |
