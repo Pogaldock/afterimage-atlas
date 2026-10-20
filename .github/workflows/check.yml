@@ -42,6 +42,17 @@ jobs:
           if mt:
               r = get(mt[0]["mp4"]); print(f"- edit video → {r.status} {r.headers.get('content-type')} {r.headers.get('content-length')}B")
           PY
+      - name: video upload plumbing (start, one part, abort, leaves nothing behind)
+        env:
+          ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
+        run: |
+          S=https://atlas.symbiozefpv.com; O=curator/last-check.md; H="authorization: Bearer $ATLAS_TOKEN"
+          head -c 6000000 /dev/urandom > /tmp/part
+          J=$(curl -s -X POST -H "$H" -H "content-type: application/json" -d '{"name":"check.mp4","type":"video/mp4","size":6000000}' $S/api/atlas/vid/start)
+          K=$(echo "$J" | python3 -c "import sys,json;print(json.load(sys.stdin).get('key',''))"); U=$(echo "$J" | python3 -c "import sys,json;print(json.load(sys.stdin).get('up',''))")
+          P=$(curl -s -X PUT -H "$H" --data-binary @/tmp/part "$S/api/atlas/vid/part?key=$K&up=$U&n=1")
+          A=$(curl -s -X POST -H "$H" -H "content-type: application/json" -d "{\"key\":\"$K\",\"up\":\"$U\"}" $S/api/atlas/vid/abort)
+          echo "- video upload: start → ${K:+ok} | part → $P | abort → $A" >> $O
       - name: commit report
         if: always()
         env:
