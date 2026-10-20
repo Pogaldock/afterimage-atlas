@@ -717,6 +717,11 @@ const STYLES=[
  obj:{g:"sphere",m:2,a:"#ffd400",b:"#ff3b3b",c:"#ffffff"},logo:"weird",glyph:"eye",pat:"stars",loop:"hue",flyer:"weird",
  snd:{bpm:128,drone:[65,65.4],wave:"square",cut:2400,dist:.2,noise:.03,arp:[523,659,784,1047,784,659],arpRate:10,arpWave:"square",arpCut:3600,sweep:1},
  v:{ink:"#ffffff",mut:"#c9c9c9",line:"rgba(255,212,0,.35)",panel:"rgba(11,11,11,.88)",acc:"#ffd400",r:"20px",chipr:"20px",tfont:"'Major Mono Display',monospace"}},
+{id:"pop",mode:6,name:"Pop culture",era:"1969 →",pal:["#0b0b0b","#ffffff","#ffd400","#ff3b3b","#1e90ff"],tag:"Film stills, cartoons, games and the pictures a whole generation shares.",
+ names:["film still","cartoon","arcade","album cover","anime","prime time"],rel:["hyper","weird","digi"],
+ obj:{g:"sphere",m:2,a:"#ffd400",b:"#ff3b3b",c:"#ffffff"},logo:"weird",glyph:"eye",pat:"stars",loop:"hue",flyer:"weird",
+ snd:{bpm:128,drone:[65,65.4],wave:"square",cut:2400,dist:.2,noise:.03,arp:[523,659,784,1047,784,659],arpRate:10,arpWave:"square",arpCut:3600,sweep:1},
+ v:{ink:"#ffffff",mut:"#c9c9c9",line:"rgba(255,212,0,.35)",panel:"rgba(11,11,11,.88)",acc:"#ffd400",r:"20px",chipr:"20px",tfont:"'Major Mono Display',monospace"}},
 {id:"psych",mode:8,name:"Psychedelic",era:"1965 →",pal:["#ff2e88","#ffe600","#00e0ff","#7a00ff","#ff7a00"],tag:"Melting letters, op-art spirals and liquid light.",
  names:["Fillmore poster","op art","liquid light show","blotter","mandala","kaleidoscope"],rel:["alien","free","vapor"],
  obj:{g:"torus",m:2,a:"#ff2e88",b:"#ffe600",c:"#00e0ff"},logo:"fried",glyph:"sun",pat:"spiral",loop:"hue",flyer:"bubble",
@@ -734,7 +739,7 @@ const FAM=[
 {name:"Punk and free party",ids:["punk","free","riot"]},
 {name:"Techno and machines",ids:["techno","factory","robot","tech","digital"]},
 {name:"Signals from elsewhere",ids:["alien","psych","drone","war"]},
-{name:"Internet folklore",ids:["meme"]}
+{name:"Internet folklore",ids:["meme","pop"]}
 ];
 const byId={};STYLES.forEach((s,i)=>{s.i=i;byId[s.id]=s;});
 const N=STYLES.length;

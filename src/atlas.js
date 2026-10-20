@@ -16,7 +16,7 @@ import { isAdmin } from "./auth.js";
 //
 // Nothing here touches D1, Workers AI or Images. Crawling, scoring, dedupe and thumbnails run in curator/ on GitHub.
 
-const STYLES = ["inbox","crt","datamosh","analog","y2k","aero","vapor","weird","hyper","digi","witch","drain","mound","opium","goth","scene","black","death","sigil","punk","free","techno","digital","tech","factory","war","riot","drone","robot","alien","psych","meme"];
+const STYLES = ["inbox","crt","datamosh","analog","y2k","aero","vapor","weird","hyper","digi","witch","drain","mound","opium","goth","scene","black","death","sigil","punk","free","techno","digital","tech","factory","war","riot","drone","robot","alien","psych","meme","pop"];
 const CORS = { "access-control-allow-origin": "*", "access-control-allow-methods": "POST, GET, PUT, OPTIONS", "access-control-allow-headers": "content-type, authorization" };
 const json = (d, status = 200, extra = {}) => new Response(JSON.stringify(d), { status, headers: { "content-type": "application/json", ...CORS, ...extra } });
 const EXT = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif", "image/avif": "avif" };
