@@ -1,10 +1,10 @@
-# Extractor run 2026-10-20 00:12 UTC
+# Extractor run 2026-10-20 01:26 UTC
 
-- ran: 1792454338
+- ran: 1792456583
 - taste: {'positives': 416, 'negatives': 680, 'on': True}
-- images: 180
-- candidates: 147
-- kinds: {'symbol': 9, 'speaker': 2, 'object': 26, 'illustration': 17, 'logo': 34, 'lettering': 21, 'face': 18, 'ink': 7, 'vinyl': 3, 'person': 9, 'vehicle': 1}
-- remaining: 4129
-- seconds: 806
+- images: 500
+- candidates: 233
+- kinds: {'ink': 2, 'object': 138, 'person': 39, 'face': 10, 'logo': 20, 'lettering': 6, 'speaker': 4, 'illustration': 4, 'vinyl': 4, 'symbol': 2, 'vehicle': 4}
+- remaining: 3870
+- seconds: 3010
 - errors: 0
