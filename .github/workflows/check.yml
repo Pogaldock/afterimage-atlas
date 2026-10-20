@@ -27,7 +27,11 @@ jobs:
           m = json.load(get("/atlas/manifest.json")); st = m.get("styles", m)
           n = sum(len(v) for v in st.values()); print(f"\n- manifest: {n} images in {len(st)} styles")
           h = get("/atlas/").read().decode()
-          print("- page has: archive=" + str("march" in h) + " new-label=" + str("New · " in h) + " seen3s=" + str("Math.min(3,v.duration" in h) + " safe-saves=" + str("SAVING=" in h) + " seen-strip=" + str("mseenh" in h))
+          print("- page has: archive=" + str("march" in h) + " new-label=" + str("New · " in h) + " seen3s=" + str("Math.min(3,v.duration" in h) + " safe-saves=" + str("SAVING=" in h) + " seen-strip=" + str("mseenh" in h) + " video-upload=" + str("vidbtn" in h and "/api/atlas/vid/part" in h))
+          import urllib.error
+          for u, meth in (("/api/atlas/vid", "GET"), ("/api/atlas/vid/start", "POST")):
+              try: urllib.request.urlopen(urllib.request.Request(S + u, method=meth, data=b"{}" if meth == "POST" else None, headers={"user-agent": "atlas-check", "content-type": "application/json", "origin": S}), timeout=30); print(f"- {u} without login → 200 (BAD: should refuse)")
+              except urllib.error.HTTPError as e_: print(f"- {u} without login → {e_.code} (should be 403)")
           print("- memes: " + str(len(st.get("meme", []))) + ", pop culture: " + str(len(st.get("pop", []))))
           first = next(iter(st.values()))[0]; th = first.get("th") or first.get("url")
           print(f"- thumbnail `{th}` → {get(th).status}")
