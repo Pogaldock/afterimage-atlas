@@ -321,9 +321,9 @@ def push_uploads(st, ups):
     return kept
 
 _PARTIAL = {"t": time.time(), "n": 0}
-def partial_publish(st, every=15 * 60):
-    """mid-run site update, at most every 15 minutes: a small extra part with the new thumbnails and the current manifest,
-    then a rebuild. Costs one extra site build (~2 min of the free 3,000 a month) per 15 minutes of searching."""
+def partial_publish(st, every=25 * 60):
+    """mid-run site update, at most every 25 minutes: a small extra part with the new thumbnails and the current manifest,
+    then a rebuild. Costs one extra site build (~2 min of the free 3,000 a month) per 25 minutes of searching."""
     hook = os.environ.get("DEPLOY_HOOK", "")
     if not hook or time.time() - _PARTIAL["t"] < every: return
     _PARTIAL["t"] = time.time(); ok = st.ok(); styles = {}; tdir = os.path.join(st.bundle, "t"); new = []
