@@ -256,7 +256,7 @@ async function stats(env) {
 }
 
 // ---------- curator endpoints (GitHub Action) ----------
-const OBJ_OK = /^atlas\/(clip\.(json|npz)|elclip\.npz|curator\.json|extractor\.json|flags\.json|manifest\.json|elements\.json|cands\.json|extracted\.json|seen\.json|killed\.json|qstats\.json|qtallied\.json|elhist\.json|static\.tar|static-\d+\.tar|static\.json|mont\.json|montage\.json|mont\/[a-z0-9]+\.(mp4|jpg)|arch\/[a-z0-9]+\.(mp4|jpg)|arch\.json)$/;
+const OBJ_OK = /^atlas\/(clip\.(json|npz)|elclip\.npz|curator\.json|extractor\.json|flags\.json|manifest\.json|elements\.json|cands\.json|extracted\.json|seen\.json|killed\.json|qstats\.json|qtallied\.json|elhist\.json|static\.tar|static-\d+\.tar|static\.json|mont\.json|montage\.json|mont\/[a-z0-9]+\.(mp4|jpg)|arch\/[a-z0-9]+\.(mp4|jpg)|arch\.json|vid\.json|vid\/raw\/[a-f0-9]{20}\.(mp4|mov|webm|m4v)|vid\/clip\/[a-f0-9]{20}-\d{1,3}\.(mp4|jpg))$/;
 async function objGet(env, key) {
   if (!OBJ_OK.test(key)) return json({ error: "key not allowed" }, 400);
   const o = await env.STORE.get(key);
@@ -270,6 +270,46 @@ async function objPut(env, req, key) {
   await env.STORE.put(key, body, { httpMetadata: { contentType: req.headers.get("content-type") || "application/octet-stream" } });
   return json({ ok: true, bytes: body.byteLength });
 }
+// ---------- your own videos: resumable multipart upload straight into R2 (admin only) ----------
+// The edits job later cuts each one into short 720p clips (atlas/vid/clip/) and deletes the original, so storage stays small.
+const VKEY = "atlas/vid.json", VID_RAW = /^atlas\/vid\/raw\/[a-f0-9]{20}\.(mp4|mov|webm|m4v)$/, RAW_CAP = 4 * 1024 ** 3;
+const VEXT = { "video/mp4": "mp4", "video/quicktime": "mov", "video/webm": "webm", "video/x-m4v": "m4v" };
+async function vidStart(env, req) {
+  if (!(await okKey(env, null, req))) return json({ error: "not logged in" }, 403);
+  const b = await req.json().catch(() => ({})); const ext = VEXT[b.type] || (/\.(mp4|mov|webm|m4v)$/i.exec(b.name || "") || [])[1]?.toLowerCase();
+  if (!ext) return json({ error: "mp4, mov or webm only" }, 400);
+  const size = +b.size || 0; if (size < 1000 || size > 3 * 1024 ** 3) return json({ error: "file too big (3 GB max)" }, 413);
+  const v = await readJson(env, VKEY, { items: [] }); const pending = v.items.filter((x) => x.state === "raw").reduce((a, x) => a + (x.size || 0), 0);
+  if (pending + size > RAW_CAP) return json({ error: "4 GB of videos are already waiting to be cut; the next batch clears them" }, 429);
+  const id = [...crypto.getRandomValues(new Uint8Array(10))].map((x) => x.toString(16).padStart(2, "0")).join("");
+  const key = "atlas/vid/raw/" + id + "." + ext; const up = await env.STORE.createMultipartUpload(key, { httpMetadata: { contentType: b.type || "video/mp4" } });
+  return json({ id, key, up: up.uploadId });
+}
+async function vidPart(env, req, url) {
+  if (!(await okKey(env, null, req))) return json({ error: "not logged in" }, 403);
+  const key = url.searchParams.get("key") || "", up = url.searchParams.get("up") || "", n = +url.searchParams.get("n");
+  if (!VID_RAW.test(key) || !up || !(n >= 1 && n <= 10000)) return json({ error: "bad part" }, 400);
+  const len = +req.headers.get("content-length") || 0; if (len > 100 * 1024 * 1024) return json({ error: "part too big" }, 413);
+  const part = await env.STORE.resumeMultipartUpload(key, up).uploadPart(n, req.body);
+  return json({ n: part.partNumber, etag: part.etag });
+}
+async function vidDone(env, req) {
+  if (!(await okKey(env, null, req))) return json({ error: "not logged in" }, 403);
+  const b = await req.json().catch(() => ({}));
+  if (!VID_RAW.test(b.key || "") || !b.up || !Array.isArray(b.parts) || !b.parts.length) return json({ error: "bad request" }, 400);
+  const parts = b.parts.map((x) => ({ partNumber: +x.n, etag: String(x.etag) })).sort((a, c) => a.partNumber - c.partNumber);
+  const obj = await env.STORE.resumeMultipartUpload(b.key, b.up).complete(parts);
+  const id = b.key.split("/").pop().split(".")[0];
+  const it = { id, key: b.key, name: String(b.name || "").slice(0, 120), size: obj.size, added: now(), state: "raw", clips: [] };
+  await casJson(env, VKEY, { items: [] }, (v) => { v.items = (v.items || []).filter((x) => x.id !== id); v.items.unshift(it); return v; });
+  return json({ ok: true, it });
+}
+async function vidAbort(env, req) {
+  if (!(await okKey(env, null, req))) return json({ error: "not logged in" }, 403);
+  const b = await req.json().catch(() => ({})); if (!VID_RAW.test(b.key || "") || !b.up) return json({ error: "bad request" }, 400);
+  try { await env.STORE.resumeMultipartUpload(b.key, b.up).abort(); } catch {} return json({ ok: true });
+}
+
 // Multipart upload of vetted images: style[], src[], page[], file[] in matching order.
 async function putMany(env, req) {
   const fd = await req.formData();
@@ -326,11 +366,19 @@ export async function handleAtlas(req, env) {
   const url = new URL(req.url); const p = url.pathname;
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
   if (p === "/api/atlas/flags" && req.method === "GET") return flagsGet(env);
-  if (req.method === "POST" && /^\/api\/atlas\/(flags|el|el\/delete)$/.test(p) && !okTok(env, req)) {
+  if ((req.method === "POST" || req.method === "PUT") && /^\/api\/atlas\/(flags|el|el\/delete|vid\/(start|part|done|abort))$/.test(p) && !okTok(env, req)) {
     const o = req.headers.get("origin"); if (o !== url.origin) return json({ error: "wrong origin" }, 403);
   }
   if (p === "/api/atlas/flags" && req.method === "POST") return flagsPost(env, req);
   if (p === "/api/atlas/el" && req.method === "POST") return elPost(env, req);
+  if (p === "/api/atlas/vid/start" && req.method === "POST") return vidStart(env, req);
+  if (p === "/api/atlas/vid/part" && req.method === "PUT") return vidPart(env, req, url);
+  if (p === "/api/atlas/vid/done" && req.method === "POST") return vidDone(env, req);
+  if (p === "/api/atlas/vid/abort" && req.method === "POST") return vidAbort(env, req);
+  if (p === "/api/atlas/vid" && req.method === "GET") {
+    if (!(await okKey(env, null, req))) return json({ error: "not logged in" }, 403);
+    return json(await readJson(env, VKEY, { items: [] }), 200, { "cache-control": "no-store" });
+  }
   if (p === "/api/atlas/el/delete" && req.method === "POST") return elDelete(env, req);
   if (p === "/api/atlas/stats" && req.method === "GET") {
     const ck = new Request(url.origin + "/api/atlas/stats"), hit = await caches.default.match(ck); if (hit) return hit;
@@ -344,7 +392,7 @@ export async function handleAtlas(req, env) {
     if (sub === "obj" && req.method === "GET") return objGet(env, (url.searchParams.get("o") || url.searchParams.get("key") || ""));
     if (sub === "obj" && req.method === "PUT") return objPut(env, req, (url.searchParams.get("o") || url.searchParams.get("key") || ""));
     if (sub === "obj" && req.method === "DELETE") {   // only pruned edits can be deleted, nothing else
-      const k = url.searchParams.get("o") || ""; if (!/^atlas\/(mont|arch)\/[a-z0-9]+\.(mp4|jpg)$/.test(k)) return json({ error: "key not allowed" }, 400);
+      const k = url.searchParams.get("o") || ""; if (!(/^atlas\/(mont|arch)\/[a-z0-9]+\.(mp4|jpg)$/.test(k) || VID_RAW.test(k))) return json({ error: "key not allowed" }, 400);
       await env.STORE.delete(k); return json({ ok: true });
     }
     if (sub === "put" && req.method === "POST") return putMany(env, req);

@@ -158,6 +158,12 @@ body.noscroll{overflow:hidden;touch-action:none}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
 .chips button{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:7px 12px;cursor:pointer}
 .chips button.on{background:var(--ink);color:#000;border-color:var(--ink)}
+.vidup{margin:0 0 18px;border:1px dashed var(--line);border-radius:12px;padding:14px}
+.vidup>button{font-family:var(--f-mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;width:100%;padding:16px;border-radius:10px;border:1px solid var(--ink);background:var(--ink);color:#000;cursor:pointer}
+.vidup p{font-family:var(--f-mono);font-size:11px;color:var(--mute,#999);margin:8px 0 0}
+.vrow{display:flex;justify-content:space-between;gap:10px;font-family:var(--f-mono);font-size:11px;margin-top:8px;align-items:center}
+.vrow span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.vbar{height:3px;background:var(--line);border-radius:2px;margin-top:4px;overflow:hidden}.vbar i{display:block;height:100%;background:var(--ink);width:0}
 .egrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
 .mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
 .mgrid.seen{grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:5px;margin-top:6px}
@@ -1314,6 +1320,7 @@ function editsHTML(){
   const items=MONT.filter(x=>mState(x.id)!=="dead"&&!mDone(x.id)),seen=ADM?MONT.filter(x=>mState(x.id)!=="dead"&&mDone(x.id)):[];const per={};for(const x of items)per[x.style]=(per[x.style]||0)+1;
   const chips='<button type="button" data-f="" class="on">'+(ADM?'New · ':'All · ')+items.length+'</button>'+Object.keys(per).map(k=>'<button type="button" data-f="'+k+'">'+(byId[k]?byId[k].name:k)+' · '+per[k]+'</button>').join("");
   return '<article class="sp edits"><header class="hero"><p class="kick">Edits</p><h1 class="t">Montages</h1><p class="lead">Made overnight: a track pulled for the style, the cut-outs and the images kept here, one of the lines, cut on the onsets with real datamosh between shots. New ones every night; '+(ADM?'keep or kill each one and the next night rolls more of what you kept.':'nothing here is hand-edited.')+'</p></header>'
+    +(ADM?'<div class="vidup"><button type="button" id="vidbtn">Add your videos</button><input type="file" id="vidin" accept="video/*" multiple hidden><p>Your own footage. Each one gets cut into short clips and used in the next batches. Keep this page open while it uploads.</p><div id="vidlist"></div></div>':'')
     +'<div class="chips" id="mchips">'+chips+(ADM?'<button type="button" id="march">Archive</button>':'')+'</div><div id="marchgrid"></div>'
     +(items.length?'<div class="mgrid" id="mgrid">'+items.map(x=>'<figure class="mc '+mState(x.id)+'" data-id="'+x.id+'" data-style="'+esc(x.style)+'"><img src="'+esc(x.poster)+'" alt="" loading="lazy"><i></i><figcaption>'+esc(byId[x.style]?byId[x.style].name:x.style)+' · '+esc(x.track&&x.track.title||"")+'</figcaption></figure>').join("")+'</div>':'<p class="src">Nothing yet — the first batch lands after tonight\'s run.</p>')+(seen.length?'<p class="src mseenh" id="mseenh">Seen · '+seen.length+' · they move to the Archive an hour after</p><div class="mgrid seen" id="mseen">'+seen.map(x=>'<figure class="mc seen" data-id="'+x.id+'" data-style="'+esc(x.style)+'"><img src="'+esc(x.poster)+'" alt="" loading="lazy"></figure>').join("")+'</div>':'<div class="mgrid seen" id="mseen"></div>')+'</article>';
 }
@@ -1381,7 +1388,23 @@ async function showArchive(){const g=document.getElementById("marchgrid");if(!g)
   if(!ARCHV){const r=await fetch("/api/atlas/arch").then(x=>x.json()).catch(()=>({items:[]}));ARCHV=r.items||[];}
   const mg=document.getElementById("mgrid");if(mg)mg.hidden=true;
   g.innerHTML=ARCHV.length?'<p class="src">Archive · '+ARCHV.length+' seen edits, kept small</p><div class="mgrid">'+ARCHV.map(x=>'<figure class="mc arch" data-aid="'+x.id+'"><img src="'+esc(x.poster)+'" alt="" loading="lazy"><i></i><figcaption>'+esc(byId[x.style]?byId[x.style].name:x.style)+' · '+esc(x.track&&x.track.title||"")+'</figcaption></figure>').join("")+'</div>':'<p class="src">Nothing archived yet. Edits you have seen move here when they leave the list.</p>';}
+// ---------- your own videos: chunked upload straight into storage, resumable part by part ----------
+const VPART=32*1024*1024;
+function vrow(name){const d=document.createElement("div");d.innerHTML='<div class="vrow"><span>'+esc(name)+'</span><span class="vst">starting</span></div><div class="vbar"><i></i></div>';const l=document.getElementById("vidlist");if(l)l.prepend(d);return{st:t=>{const x=d.querySelector(".vst");if(x)x.textContent=t;},bar:f=>{const x=d.querySelector(".vbar i");if(x)x.style.width=Math.round(f*100)+"%";}};}
+async function vjson(u,o){const r=await fetch(u,o);const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||("error "+r.status));return j;}
+async function upVideo(f){const row=vrow(f.name);let s;
+  try{s=await vjson("/api/atlas/vid/start",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({name:f.name,type:f.type,size:f.size})});}catch(e){row.st(e.message);return;}
+  const n=Math.ceil(f.size/VPART),parts=[];
+  for(let i=0;i<n;i++){let ok=false;
+    for(let a=0;a<4&&!ok;a++){try{const j=await vjson("/api/atlas/vid/part?key="+encodeURIComponent(s.key)+"&up="+encodeURIComponent(s.up)+"&n="+(i+1),{method:"PUT",body:f.slice(i*VPART,Math.min(f.size,(i+1)*VPART))});parts.push({n:j.n,etag:j.etag});ok=true;}catch(e){row.st("retrying");await new Promise(r=>setTimeout(r,1500*(a+1)));}}
+    if(!ok){row.st("failed, try again");fetch("/api/atlas/vid/abort",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({key:s.key,up:s.up})});return;}
+    row.bar((i+1)/n);row.st(Math.round((i+1)/n*100)+"%");}
+  try{await vjson("/api/atlas/vid/done",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({key:s.key,up:s.up,parts,name:f.name})});row.st("in, waiting for the next batch");}catch(e){row.st(e.message);}}
+async function vidList(){const l=document.getElementById("vidlist");if(!l||!ADM)return;try{const v=await vjson("/api/atlas/vid",{cache:"no-store"});
+  l.innerHTML=(v.items||[]).slice(0,12).map(x=>'<div class="vrow"><span>'+esc(x.name||x.id)+'</span><span>'+(x.state==="raw"?"waiting for the next batch":x.state==="cut"?(x.clips||[]).length+" clips in use":esc(x.state||""))+'</span></div>').join("");}catch(e){}}
+document.addEventListener("change",async e=>{if(e.target.id!=="vidin")return;const fs=[...e.target.files];e.target.value="";for(const f of fs)await upVideo(f);});
 view.addEventListener("click",e=>{
+  if(e.target.closest("#vidbtn")){const i=document.getElementById("vidin");if(i)i.click();return;}
   if(e.target.closest("#march")){view.querySelectorAll("#mchips button").forEach(b=>b.classList.toggle("on",b.id==="march"));showArchive();return;}
   const af=e.target.closest("figure.mc.arch");if(af&&ARCHV){blip(520);playEdit(af.dataset.aid,ARCHV);return;}
   const ch=e.target.closest("#mchips [data-f]");if(ch){const ag=document.getElementById("marchgrid");if(ag)ag.innerHTML="";const mg=document.getElementById("mgrid");if(mg)mg.hidden=false;view.querySelectorAll("#mchips button").forEach(b=>b.classList.toggle("on",b===ch));view.querySelectorAll(".mc").forEach(f=>{f.hidden=!!(ch.dataset.f&&f.dataset.style!==ch.dataset.f);});return;}
@@ -1451,7 +1474,7 @@ function route(){
   view.classList.remove("in");void view.offsetWidth;view.classList.add("in");
   document.title=s?(s.name+" · Afterimage Atlas"):isEl?"Elements · Afterimage Atlas":isMap?"Map · Afterimage Atlas":isEd?"Edits · Afterimage Atlas":"Afterimage Atlas";
   if(isEl){Promise.all([manifest(),isAdm()]).then(()=>{if(location.hash.slice(1)==="elements")view.innerHTML=elementsHTML();});}
-  if(isEd){Promise.all([manifest(),isAdm()]).then(()=>{if(location.hash.slice(1)==="edits")view.innerHTML=editsHTML();});}
+  if(isEd){Promise.all([manifest(),isAdm()]).then(()=>{if(location.hash.slice(1)==="edits"){view.innerHTML=editsHTML();vidList();}});}
   $("#idx").textContent=s?"All "+N:"Index";
   mount3D(s?s.obj:{g:"knot",m:2,a:"#7bf7ff",b:"#ff4fd8",c:"#ffffff"});
   if(SND.ctx)sndPatch(currentPatch());blip(s?440+s.i*30:330);
