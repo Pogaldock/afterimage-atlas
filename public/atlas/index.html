@@ -1308,6 +1308,9 @@ function editsHTML(){
     +'<div class="chips" id="mchips">'+chips+'</div>'
     +(items.length?'<div class="mgrid" id="mgrid">'+items.map(x=>'<figure class="mc '+mState(x.id)+'" data-id="'+x.id+'" data-style="'+esc(x.style)+'"><img src="'+esc(x.poster)+'" alt="" loading="lazy"><i></i><figcaption>'+esc(byId[x.style]?byId[x.style].name:x.style)+' · '+esc(x.track&&x.track.title||"")+'</figcaption></figure>').join("")+'</div>':'<p class="src">Nothing yet — the first batch lands after tonight\'s run.</p>')+'</article>';
 }
+// an edit whose files aren't on the site (yet, or any more) leaves the list instead of showing a black tile
+function dropEdit(id){const g=document.querySelector('.mc[data-id="'+id+'"]');if(g)g.remove();const k=MONT.findIndex(y=>y.id===id);if(k>=0)MONT.splice(k,1);}
+document.addEventListener("error",e=>{const t=e.target;if(t&&t.matches&&t.matches(".mc img")){const f=t.closest(".mc");if(f)dropEdit(f.dataset.id);}},true);
 function playEdit(id){
   const x=MONT.find(y=>y.id===id);if(!x)return;const adm=!!ADM;let i=MONT.indexOf(x);
   const el=document.createElement("div");el.className="mplay";document.body.classList.add("noscroll");
@@ -1320,6 +1323,7 @@ function playEdit(id){
       +(adm?'<button type="button" class="keep'+(st==="ok"?" on":"")+'" data-keep><b>♥</b>'+(st==="ok"?"Kept":"Keep")+'</button>':(x.track&&x.track.url?'<a class="tbt" href="'+esc(x.track.url)+'" target="_blank" rel="noopener"><b>♪</b>Track</a>':''))
       +'</div>';
     const v=el.querySelector("video");v.addEventListener("click",()=>{v.paused?v.play():v.pause();});
+    v.addEventListener("error",()=>{const gone=MONT[i].id;dropEdit(gone);if(!MONT.length){close();return;}i=i%MONT.length;draw();});
     const g=document.querySelector('.mc[data-id="'+x.id+'"]');if(g)g.className="mc "+st;}
   el.addEventListener("click",e=>{const x=MONT[i];
     if(e.target.closest("[data-x]")){close();return;}
