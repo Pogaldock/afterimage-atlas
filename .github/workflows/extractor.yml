@@ -9,7 +9,8 @@ on:
         description: "images to process this run"
         default: "500"
 permissions:
-  contents: write
+  contents: read
+  issues: write
 concurrency: extractor
 jobs:
   extract:
@@ -42,14 +43,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          git config user.name "atlas bot"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
-          cp curator/last-extract.md /tmp/report.md
-          for i in 1 2 3 4 5; do
-            git reset -q --hard && git fetch -q origin main && git checkout -q -B main origin/main
-            cp /tmp/report.md curator/last-extract.md
-            git add curator/last-extract.md
-            if git diff --cached --quiet; then echo "no report change"; break; fi
-            if git commit -q -m "extractor: run report" && git push -q origin main; then echo "report pushed"; break; fi
-            echo "push rejected, retrying ($i)"; sleep $((i*15))
-          done
+          T="report: extractor"; N=$(gh issue list --repo "$GITHUB_REPOSITORY" --state all --search "in:title $T" --json number,title --jq ".[] | select(.title==\"$T\") | .number" | head -1)
+          if [ -z "$N" ]; then gh issue create --repo "$GITHUB_REPOSITORY" --title "$T" --body-file curator/last-extract.md >/dev/null; else gh issue edit "$N" --repo "$GITHUB_REPOSITORY" --body-file curator/last-extract.md >/dev/null; fi
+          echo "report posted to issue: $T"

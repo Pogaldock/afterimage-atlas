@@ -3,7 +3,8 @@ name: atlas check
 on:
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
+  issues: write
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -42,6 +43,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          git config user.name "atlas bot"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
-          git add curator/last-check.md && git commit -q -m "check: report" && git pull -q --rebase origin main && git push -q origin HEAD:main
+          T="report: check"; N=$(gh issue list --repo "$GITHUB_REPOSITORY" --state all --search "in:title $T" --json number,title --jq ".[] | select(.title==\"$T\") | .number" | head -1)
+          if [ -z "$N" ]; then gh issue create --repo "$GITHUB_REPOSITORY" --title "$T" --body-file curator/last-check.md >/dev/null; else gh issue edit "$N" --repo "$GITHUB_REPOSITORY" --body-file curator/last-check.md >/dev/null; fi
+          echo "report posted to issue: $T"
