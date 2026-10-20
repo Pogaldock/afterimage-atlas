@@ -1,0 +1,242 @@
+# Curator run 2026-10-20 00:47 UTC
+
+- ran: 1792454337
+- errors: 3
+  - element 96f86dc3159555b8411c: UnidentifiedImageError: cannot identify image file <_io.BytesIO object at 0x7f7f6b445710>
+  - element 779a8f70b90582778b87: UnidentifiedImageError: cannot identify image file <_io.BytesIO object at 0x7f7f46f367a0>
+  - element ade4ac8262cb01edc539: UnidentifiedImageError: cannot identify image file <_io.BytesIO object at 0x7f7f46f367a0>
+- items: 5529
+- cached: 6422
+- kept: 493
+- user_kills: 0
+- user_moves: 0
+- embedded: 0
+- dist: {'crt': [0.39, 0.47, 0.6, 0.78, 0.87], 'datamosh': [0.23, 0.61, 0.86, 1.0, 1.0], 'analog': [0.21, 0.47, 0.67, 0.84, 1.0], 'y2k': [0.09, 0.45, 0.56, 0.73, 0.9], 'aero': [0.0, 0.47, 0.68, 0.87, 1.0], 'vapor': [0.01, 0.56, 0.87, 1.0, 1.0], 'weird': [0.4, 0.45, 0.58, 0.76, 0.86], 'hyper': [0.0, 0.42, 0.58, 0.79, 1.0], 'digi': [0.23, 0.45, 0.59, 0.78, 0.94], 'witch': [0.0, 0.0, 0.19, 0.61, 0.8], 'drain': [0.46, 0.5, 0.74, 0.8, 0.89], 'mound': [0.34, 0.49, 0.7, 0.79, 0.86], 'opium': [0.18, 0.62, 0.95, 1.0, 1.0], 'goth': [0.0, 0.02, 0.44, 0.5, 0.51], 'scene': [0.12, 0.45, 0.7, 0.92, 1.0], 'black': [0.03, 0.48, 0.66, 0.88, 1.0], 'death': [0.42, 0.45, 0.52, 0.72, 0.84], 'sigil': [0.21, 0.42, 0.47, 0.54, 0.6], 'punk': [0.45, 0.49, 0.5, 0.63, 0.78], 'free': [0.33, 0.36, 0.45, 0.5, 0.53], 'techno': [0.52, 0.59, 0.72, 0.92, 1.0], 'digital': [0.69, 0.8, 0.98, 1.0, 1.0], 'tech': [0.76, 0.88, 0.98, 1.0, 1.0], 'factory': [0.65, 0.69, 0.72, 0.86, 0.93], 'war': [0.49, 0.63, 0.78, 0.95, 1.0], 'riot': [0.5, 0.66, 0.85, 1.0, 1.0], 'drone': [0.46, 0.58, 0.78, 1.0, 1.0], 'robot': [0.51, 0.66, 0.85, 1.0, 1.0], 'alien': [0.42, 0.56, 0.76, 0.92, 1.0], 'psych': [0.81, 0.86, 0.96, 1.0, 1.0]}
+- scored: 5529
+- low_candidates: 384
+- move_candidates: 728
+- killed_dupes: 0
+- budget: 5529 images, limit 9000
+- applied: {'ok': True, 'killed': 0, 'moved': 0, 'count': 5529}
+- queries_retired: []
+- negatives: 583
+- ai_blocked: 181
+- source: found 1250, downloaded 1115, uploaded 300
+  - `crt scanline anime edit` → 35
+  - `phosphor crt effect aesthetic edit` → 35
+  - `noblethevision edit` → 35
+  - `sad anime edit crt glitch instagram` → 35
+  - `commons: phosphor screen close-up` → 6
+  - `datamosh glitch art` → 35
+  - `datamoshing frame macroblocks` → 35
+  - `pixel sorting glitch art` → 35
+  - `corrupted video frame art` → 35
+  - `commons: glitch art` → 29
+  - `analog horror vhs still` → 35
+  - `vhs tracking noise found footage` → 35
+  - `analog horror timestamp screenshot` → 35
+  - `local 58 style vhs frame` → 35
+  - `commons: analog television noise` → 7
+  - `y2k aesthetic graphic design 2000` → 35
+  - `cyber y2k chrome text` → 35
+  - `y2k futurism poster 1999` → 35
+  - `y2k translucent plastic design` → 35
+  - `caa: tag:eurodance AND firstreleasedate:[1998 TO 2002]` → 60
+  - `caa: tag:trance AND firstreleasedate:[1999 TO 2002]` → 60
+  - `commons: Y2K aesthetic` → 31
+  - `frutiger aero wallpaper` → 35
+  - `frutiger aero design 2008` → 35
+  - `windows vista aero aesthetic` → 35
+  - `glossy aqua bubbles grass design 2006` → 35
+  - `commons: Frutiger Aero` → 30
+  - `vaporwave album cover` → 35
+  - `vaporwave aesthetic art` → 35
+  - `vaporwave collage greek bust` → 35
+  - `vaporwave bandcamp art 2013` → 35
+  - `caa: tag:vaporwave` → 60
+  - `caa: artist:"Macintosh Plus" OR artist:"Saint Pepsi" OR artist:2814 OR artist:"Blank Banshee"` → 60
+  - `commons: vaporwave art` → 35
+  - `weirdcore aesthetic` → 35
+  - `dreamcore image` → 35
+  - `weirdcore edit eyes text` → 35
+  - `liminal space weirdcore` → 35
+  - `hyperpop album cover` → 35
+  - `pc music artwork` → 35
+  - `100 gecs artwork` → 35
+  - `hyperpop aesthetic 3d render` → 35
+  - `caa: tag:hyperpop` → 60
+  - `caa: artist:"100 gecs" OR artist:SOPHIE OR artist:"A. G. Cook" OR artist:"Dorian Electra"` → 60
+  - `digicore album cover` → 35
+  - `digicore aesthetic edit` → 35
+  - `glaive cover art` → 35
+  - `ericdoa album art` → 35
+  - `caa: tag:digicore` → 60
+  - `caa: artist:glaive OR artist:ericdoa OR artist:midwxst OR artist:brakence OR artist:aldn` → 60
+  - `witch house album art` → 35
+  - `witch house aesthetic triangle cross` → 35
+  - `witch house artwork 2011` → 35
+  - `salem king night artwork` → 34
+  - `caa: tag:"witch house"` → 60
+  - `caa: artist:Salem OR artist:"Crystal Castles" OR artist:oOoOO OR artist:"White Ring"` → 60
+  - `drain gang album art` → 35
+  - `bladee album cover` → 35
+  - `ecco2k e cover art` → 35
+  - `yung lean album artwork` → 35
+  - `caa: artist:Bladee OR artist:Ecco2k OR artist:"Thaiboy Digital" OR artist:"Yung Lean"` → 60
+  - `sematary album cover` → 34
+  - `haunted mound aesthetic` → 35
+  - `sematary rainbow bridge art` → 35
+  - `ghost mountain sematary artwork` → 35
+  - `caa: artist:Sematary OR artist:"Ghost Mountain" OR artist:Hackle` → 60
+  - `opium playboi carti aesthetic` → 35
+  - `playboi carti whole lotta red cover` → 35
+  - `ken carson album cover` → 35
+  - `destroy lonely album art` → 35
+  - `caa: artist:"Playboi Carti" OR artist:"Ken Carson" OR artist:"Destroy Lonely" OR artist:"Homixide Gang"` → 60
+  - `batcave club london 1983 photo` → 35
+  - `trad goth 1980s photo` → 35
+  - `siouxsie sioux 1981 photo` → 35
+  - `bauhaus band 1982 photo` → 35
+  - `caa: artist:Bauhaus OR artist:"Siouxsie and the Banshees" OR artist:"Christian Death" OR artist:"The Sisters of Mercy"` → 60
+  - `caa: artist:"Fields of the Nephilim" OR artist:"Alien Sex Fiend" OR artist:Specimen OR artist:"45 Grave"` → 60
+  - `commons: goth subculture 1980s` → 0
+  - `myspace profile layout 2007 scene` → 35
+  - `scene hair raccoon tail neon` → 35
+  - `scene kids group photo 2009` → 35
+  - `kandi bracelets scene rave` → 34
+  - `caa: tag:crunkcore` → 19
+  - `caa: artist:Brokencyde OR artist:"Blood on the Dance Floor" OR artist:Millionaires` → 60
+  - `commons: emo fashion 2008` → 12
+  - `medieval woodcut black metal` → 35
+  - `black metal demo cassette j-card` → 35
+  - `Peter Beste photo` → 35
+  - `black metal poster 1995` → 35
+  - `caa: artist:Darkthrone OR artist:Mayhem OR artist:Emperor OR artist:Burzum` → 60
+  - `caa: artist:Immortal OR artist:Satyricon OR artist:Bathory OR artist:Gorgoroth OR artist:Marduk` → 60
+  - `commons: black metal band corpse paint` → 29
+  - `deicide legion cover` → 35
+  - `autopsy mental funeral cover` → 35
+  - `bolt thrower realm of chaos cover` → 35
+  - `death metal demo tape 1989 cover` → 35
+  - `caa: tag:"death metal" AND firstreleasedate:[1987 TO 1994]` → 60
+  - `caa: artist:"Morbid Angel" OR artist:Entombed OR artist:Obituary OR artist:"Cannibal Corpse" OR artist:Carcass` → 60
+  - `commons: Morbid Angel live` → 16
+  - `cyber sigilism tattoo` → 35
+  - `cyber sigilism design` → 35
+  - `cyber tribal shirt print` → 35
+  - `cybersigilism graphic` → 35
+  - `crass style stencil poster` → 35
+  - `riot grrrl zine page` → 35
+  - `punk lettering hand drawn logo` → 35
+  - `Winston Smith collage` → 35
+  - `caa: artist:"Sex Pistols" OR artist:Crass OR artist:"Black Flag" OR artist:"Dead Kennedys" OR artist:Discharge` → 60
+  - `caa: artist:Buzzcocks OR artist:"The Exploited" OR artist:"Minor Threat" OR artist:Conflict` → 60
+  - `commons: punk flyer 1980` → 0
+  - `czechtek photo crowd speakers` → 35
+  - `free party uk documentary photography` → 35
+  - `rave field morning after photo` → 35
+  - `acid house warehouse party 1989 photo` → 35
+  - `squat rave london 90s photo` → 35
+  - `free party flyer 1990s scan` → 35
+  - `teknival flyer scan` → 35
+  - `tekno flyer photocopy info line` → 35
+  - `acid techno party poster 90s` → 35
+  - `free festival poster 1980s` → 35
+  - `sound system logo sticker tekno` → 35
+  - `squat party flyer screen print` → 35
+  - `caa: artist:"Spiral Tribe"` → 16
+  - `caa: tag:tekno AND firstreleasedate:[1992 TO 1999]` → 36
+  - `commons: Czechtek` → 8
+  - `modular synth patch cables photo` → 35
+  - `techno festival lasers night` → 35
+  - `acid techno rave 1990s photo` → 35
+  - `berlin techno bunker photo` → 35
+  - `techno record sleeve design 90s` → 35
+  - `techno poster swiss style` → 35
+  - `caa: tag:techno AND firstreleasedate:[1990 TO 1999]` → 60
+  - `caa: tag:"hard techno"` → 60
+  - `commons: Roland TB-303` → 30
+  - `commons: techno music` → 33
+  - `8-bit pixel art sprite sheet` → 35
+  - `old computer boot screen photo` → 35
+  - `bios screen photo` → 35
+  - `ascii art terminal screenshot` → 35
+  - `dithered bitmap 1bit art` → 35
+  - `lcd pixels macro photo` → 35
+  - `commons: Pixel art` → 18
+  - `commons: ASCII art` → 25
+  - `circuit board macro photo` → 35
+  - `pcb close up components` → 35
+  - `oscilloscope waveform screen photo` → 35
+  - `electronics workbench soldering photo` → 35
+  - `vintage test equipment knobs dials` → 35
+  - `breadboard leds wires` → 35
+  - `commons: Oscilloscopes` → 36
+  - `commons: Vacuum tubes` → 39
+  - `abandoned factory interior` → 35
+  - `coal mine pithead photo` → 35
+  - `industrial pipes valves photo` → 35
+  - `shipyard cranes photo` → 35
+  - `factory workers shift archive photo` → 35
+  - `power station cooling towers` → 25
+  - `commons: Assembly lines` → 35
+  - `commons: Factories` → 39
+  - `fighter planes formation archive` → 35
+  - `bunker concrete photo` → 35
+  - `camouflage pattern texture` → 35
+  - `military helicopter photo` → 35
+  - `trench ww1 archive photo` → 35
+  - `radar dish military photo` → 35
+  - `commons: World War I photographs` → 39
+  - `commons: Searchlights` → 37
+  - `protest smoke flares crowd` → 35
+  - `free party police teknival` → 35
+  - `rave police raid photo` → 35
+  - `riot shield wall photo` → 35
+  - `protest banners crowd photo` → 35
+  - `water cannon protest photo` → 35
+  - `commons: Tear gas` → 23
+  - `commons: Compagnies républicaines de sécurité` → 38
+  - `drone motor macro photo` → 35
+  - `fpv freestyle drone bando` → 35
+  - `drone light show sky` → 35
+  - `dji drone flying photo` → 35
+  - `fpv drone close up photo` → 35
+  - `fpv goggles pilot photo` → 35
+  - `commons: First-person view` → 33
+  - `commons: Drone racing` → 33
+  - `animatronic robot workshop` → 35
+  - `robot toy collection photo` → 35
+  - `robot exhibition museum` → 35
+  - `japanese robot toy 1960s` → 35
+  - `vintage tin toy robot` → 35
+  - `industrial robot arm photo` → 35
+  - `commons: Robots` → 40
+  - `commons: Industrial robots` → 33
+  - `weekly world news alien` → 35
+  - `alien sticker 90s` → 35
+  - `ufo flyer rave` → 35
+  - `martian invasion poster` → 35
+  - `b movie alien still` → 35
+  - `alien plush toy rave` → 35
+  - `ufo photo 1950s` → 35
+  - `flying saucer photo vintage` → 35
+  - `1950s sci fi movie poster aliens` → 35
+  - `pulp sci fi magazine cover alien` → 35
+  - `commons: Roswell incident` → 32
+  - `commons: Crop circles` → 19
+  - `1960s psychedelic lettering` → 35
+  - `psytrance flyer 90s` → 35
+  - `goa trance party photo uv` → 35
+  - `uv blacklight poster` → 35
+  - `kaleidoscope photo` → 35
+  - `acid house smiley flyer` → 35
+  - `caa: tag:"psychedelic rock" AND firstreleasedate:[1966 TO 1970]` → 60
+  - `caa: tag:"goa trance"` → 60
+  - `commons: Psychedelic art` → 39
+  - `commons: Op art` → 38
+- montages: 80
+- map: 5829
+- palettes: 30
+- bundle: {'images': 5829, 'thumbs': 5829, 'elements': 722, 'parts': 26, 'mb': 1061.5}
+- seconds: 2889
