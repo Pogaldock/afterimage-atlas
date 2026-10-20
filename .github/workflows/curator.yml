@@ -38,6 +38,7 @@ jobs:
       - name: curate
         env:
           ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
+          DEPLOY_HOOK: ${{ secrets.DEPLOY_HOOK }}
           IN_SKIP: ${{ github.event.inputs.skip }}
           IN_ONLY: ${{ github.event.inputs.only }}
           IN_QPR: ${{ github.event.inputs.qpr }}

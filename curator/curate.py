@@ -303,8 +303,51 @@ def src_commons(style, cfg, run_no):
         except Exception as e: status["commons: " + q] = "fail: " + str(e)[:80]
     return out, status
 
+def push_uploads(st, ups):
+    """send one style's picks to the site right away: the edits job reads the live list, so they're usable at once"""
+    kept = 0
+    for i in range(0, len(ups), 25):
+        batch = ups[i:i + 25]
+        try:
+            res = post_files("/api/atlas/cur/put", [("style", u[0]) for u in batch] + [("src", u[2]) for u in batch] + [("page", web(u[3])) for u in batch] + [("q", u[6]) for u in batch],
+                             [("file", ("img", u[1], Image.open(io.BytesIO(u[1])).get_format_mimetype() or "image/jpeg")) for u in batch])
+            for o in res.get("out", []):
+                if not o.get("key"): continue
+                k = o["i"]; u = batch[k]
+                open(os.path.join(st.bundle, "t", o["id"] + ".webp"), "wb").write(thumb_bytes(u[5]))
+                st.ids.append(o["id"]); st.E = np.concatenate([st.E, u[4][None]]); kept += 1
+                st.items.append({"id": o["id"], "style": u[0], "key": o["key"], "url": "/api/atlas/f/" + o["key"][6:], "page": u[3], "src": u[2], "q": u[6]})
+        except Exception as e: err("upload batch", e)
+    return kept
+
+_PARTIAL = {"t": time.time(), "n": 0}
+def partial_publish(st, every=15 * 60):
+    """mid-run site update, at most every 15 minutes: a small extra part with the new thumbnails and the current manifest,
+    then a rebuild. Costs one extra site build (~2 min of the free 3,000 a month) per 15 minutes of searching."""
+    hook = os.environ.get("DEPLOY_HOOK", "")
+    if not hook or time.time() - _PARTIAL["t"] < every: return
+    _PARTIAL["t"] = time.time(); ok = st.ok(); styles = {}; tdir = os.path.join(st.bundle, "t"); new = []
+    since = _PARTIAL.get("since", set())
+    for it in st.items:
+        if not os.path.exists(os.path.join(tdir, it["id"] + ".webp")): continue
+        styles.setdefault(it["style"], []).append({"id": it["id"], "th": "/atlas/t/" + it["id"] + ".webp", "url": it["url"], "page": web(it.get("page", "")), "ok": 1 if it["id"] in ok else 0, "cs": it.get("cs"), "cb": it.get("cb")})
+        if it["id"] not in st.started_ids and it["id"] not in since: new.append(it["id"])
+    if not new: return
+    for arr in styles.values(): arr.sort(key=lambda x: (-(x["ok"]), -(x["cs"] if x["cs"] is not None else 0.5)))
+    buf = io.BytesIO(); tf = tarfile.open(fileobj=buf, mode="w", format=tarfile.USTAR_FORMAT)
+    for i_ in new: tf.add(os.path.join(tdir, i_ + ".webp"), arcname="t/" + i_ + ".webp")
+    mj = json.dumps({"v": 3, "built": int(time.time()), "styles": styles}).encode(); ti = tarfile.TarInfo("manifest.json"); ti.size = len(mj); tf.addfile(ti, io.BytesIO(mj)); tf.close()
+    try:
+        name = f"atlas/static-{801 + _PARTIAL['n']}.tar"; obj_put(name, buf.getvalue(), "application/x-tar"); _PARTIAL["n"] += 1
+        idx = json.loads(obj_get("atlas/static.json") or '{"parts":[]}'); idx["parts"] = [p_ for p_ in idx.get("parts", []) if p_["key"] != name] + [{"key": name, "bytes": len(buf.getvalue())}]
+        obj_put("atlas/static.json", json.dumps(idx).encode(), "application/json")
+        requests.post(hook, timeout=30); since.update(new); _PARTIAL["since"] = since
+        log(f"partial publish: {len(new)} new images live"); report["partials"] = report.get("partials", 0) + 1
+    except Exception as e: err("partial publish", e)
+
 def source(st, run_no):
     seen = set(json.loads(obj_get("atlas/seen.json") or "[]")); status = {}; found = downloaded = kept = 0; uploads = []
+    st.started_ids = set(st.ids)
     for style, cfg in STYLES.items():
         if SOURCE_ONLY and style not in SOURCE_ONLY: continue
         cands = []
@@ -337,19 +380,8 @@ def source(st, run_no):
             uploads.append((style, b, c[0], c[1], E[k], im, q))
             if len(uploads) >= MAX_UPLOADS: break
         log(f"source {style}: {len(cands)} found, {len(got)} ok, {len(uploads)-n0} pass")
+        kept += push_uploads(st, uploads[n0:]); partial_publish(st)
         if len(uploads) >= MAX_UPLOADS: break
-    for i in range(0, len(uploads), 25):
-        batch = uploads[i:i + 25]
-        try:
-            res = post_files("/api/atlas/cur/put", [("style", u[0]) for u in batch] + [("src", u[2]) for u in batch] + [("page", web(u[3])) for u in batch] + [("q", u[6]) for u in batch],
-                             [("file", ("img", u[1], Image.open(io.BytesIO(u[1])).get_format_mimetype() or "image/jpeg")) for u in batch])
-            for o in res.get("out", []):
-                if not o.get("key"): continue
-                k = o["i"]; u = batch[k]
-                open(os.path.join(st.bundle, "t", o["id"] + ".webp"), "wb").write(thumb_bytes(u[5]))
-                st.ids.append(o["id"]); st.E = np.concatenate([st.E, u[4][None]]); kept += 1
-                st.items.append({"id": o["id"], "style": u[0], "key": o["key"], "url": "/api/atlas/f/" + o["key"][6:], "page": u[3], "src": u[2], "q": u[6]})
-        except Exception as e: err("upload batch", e)
     if kept: save_cache(st)
     obj_put("atlas/seen.json", json.dumps(sorted(seen)[-30000:]), "application/json")
     report["source"] = {"queries": status, "found": found, "downloaded": downloaded, "uploaded": kept}
