@@ -56,6 +56,7 @@ jobs:
           A=$(curl -s -X POST -H "$H" -H "content-type: application/json" -d "{\"key\":\"$K\",\"up\":\"$U\"}" $S/api/atlas/vid/abort)
           echo "- video upload: start → ${K:+ok} | part → $P | abort → $A" >> $O
           curl -s -H "$H" "$S/api/atlas/cur/obj?o=atlas/static.json" | python3 -c "import sys,json;d=json.load(sys.stdin);print('- static.json: built', d.get('built'), 'mont_at', d.get('mont_at'), 'parts', [(p['key'], p.get('bytes')) for p in d.get('parts', []) if '9' in p['key'][-8:-4]][:6], 'n', len(d.get('parts', [])))" >> $O
+          echo "- vid.json raw → $(curl -s -o /tmp/vid.json -w '%{http_code}' -H "$H" "$S/api/atlas/cur/obj?o=atlas/vid.json") $(head -c 600 /tmp/vid.json)" >> $O
           curl -s -H "$H" "$S/api/atlas/cur/obj?o=atlas/vid.json" | python3 -c "import sys,json,time
           d=json.load(sys.stdin) if sys.stdin.readable() else {}
           for x in d.get('items', []): print(f\"- your video: {x.get('name')} | {round(x.get('size',0)/1e6)} MB | {x.get('state')} | clips {len(x.get('clips',[]))} | {x.get('why','')} | uploaded {int((time.time()-x.get('added',0))/60)} min ago\")
